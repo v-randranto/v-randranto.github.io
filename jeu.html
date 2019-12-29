@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>V. Randranto - Jeu</title>
+    <link rel="stylesheet" href="./css/jeu.css">
+</head>
+
+<body>
+
+    <header>
+        <a id="home" href="index.html"><button class="home">home</button></a>
+        <h2>Véronique Randranto - Développeuse fullstack JavaScript</h2>
+        <a href="moncv.html"><button class="moncv">mon CV</button> </a>
+    </header>
+    <div id="blasonsConteneur">
+        <div id="blasonsMasque">
+            <img id="blasons" src="images/blasons.png" alt="blasons">
+        </div>
+    </div>
+
+    <section id="jeu">
+
+        <div id="scene">
+
+            <!-- affichage page "règles du jeu"  -->
+            <article id="rdj">
+                <div>
+                    <h2>Comment jouer ?</h2>
+                    <ul>
+                        Utiliser les touches :
+                        <li>&larr; : course à gauche</li>
+                        <li>&rarr; : course à droite</li>
+                        <li>&uarr; : saut gracieux</li>
+                        <li>Espace : attaque sournoise</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Score</h2>
+                    <p>Arthur doit récupérer 12 blasons :</p>
+                    <ul>
+                        <li>attaque frontale : 1 blason</li>
+                        <li>attaque par derrière : 2 blasons</li>
+                        <li>attaque aérienne, c'est-à-dire, saut sur Georges : 3 blasons mais attention aux cornes !
+                        </li>
+                    </ul>
+                    <p> Le jeu est perdu si Arthur prend un coup de cornes ou 5 gamelle.</p>
+                    <p>Il y a gamelle quand Arthur se cogne au mur ou tamponne Georges sans l'attaquer.
+                    </p>
+
+                </div>
+
+                <img id="arthurSaute" src="images/arthur_saute.gif" alt="Arthur" width="80">
+                <button id="btnJouer" class="baston">baston</button>
+                <img id="georgesAttaque" src="images/georges_attaque.gif" alt="Georges" width="130">
+
+
+            </article>
+
+            <!-- affichage page "jouer" -->
+            <div id='jouer'>
+                <div id="score">
+                    <div id="blasons"> Blasons<br><span id="nbBlasons"></span></div>
+                    <div id="gamelles">Gamelles <br><span id="nbGamelles"></span></div>
+                </div>
+                <div id="arthurMasque">
+                    <img id="arthur" src="images/arthur.png" alt="sprite d'Arthur">
+                </div>
+
+                <div id="georgesMasque">
+                    <img id="georges" src="images/georges.png" alt="sprite de george">
+                </div>
+
+            </div>
+
+            <!-- affichage page "rejouer" -->
+            <div id="rejouer">
+                <div>
+                    <p id="resultat"></p>
+                    <button id="btnJouer2" class="baston">baston again</button>
+                </div>
+            </div>
+
+    </section>
+
+    <footer>
+        Free game assets from bevouliin.com
+    </footer>
+
+    <div id="sons">
+        <audio id="sonJouer" src="ressources/tabla.mp3" type="audio/mp3"></audio>
+        <audio id="sonBlason" src="ressources/djembe.mp3" type="audio/mp3"></audio>
+        <audio id="sonGamelle" src="ressources/djembe.mp3" type="audio/mp3"></audio>
+        <audio id="sonGagne" src="ressources/hourrah.mp3" type="audio/mp3"></audio>
+        <audio id="sonPerdu" src="ressources/c_triste.mp3" type="audio/mp3"></audio>
+
+    </div>
+
+    <script src="vendor/jquery/jquery.js"></script>
+    <script src="js/jeu.js"></script>
+
+</body>
+
+</html>
