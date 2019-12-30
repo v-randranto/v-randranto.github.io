@@ -708,7 +708,7 @@ $(function () {
                     initArthurContent();
                     intervalIdArthurAction = setInterval(arthurContent, arthur.content.vitesse);
                     georgesVacille();
-                    scoreJeu.incrementBlasons(1);
+                    scoreJeu.incrementBlasons(2);
                     return;
                 }
 
@@ -744,7 +744,7 @@ $(function () {
                 initArthurContent();
                 intervalIdArthurAction = setInterval(arthurContent, arthur.content.vitesse);
                 georgesVacille();
-                scoreJeu.incrementBlasons(2);
+                scoreJeu.incrementBlasons(1);
                 return;
             }
             // Arthur n'attaque pas => il vacille, +1 gamelle

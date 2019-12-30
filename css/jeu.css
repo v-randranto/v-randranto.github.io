@@ -82,7 +82,7 @@ button:focus {
 #presentation article {
     background-color: peachpuff;
     border-radius: 20px;
-    box-shadow: 0px 0px 15px #050100;    ;
+    box-shadow: 0px 0px 15px #050100; 
     margin: 20px;
     padding: 30px 40px;
     color: black;
@@ -146,8 +146,7 @@ header {
 }
 
 #rdj div:nth-child(1) {
-    width: 30%;
-    
+    width: 30%;    
 }
 
 #rdj div:nth-child(2) {
@@ -155,7 +154,12 @@ header {
 }
 
 .regles {
-    margin: 20px;
+    margin-top: 20px;
+}
+#touches li {
+    list-style-type: none ;
+    margin-left: -10px;
+    margin-top: 5px;
 }
 
 #onyva {
