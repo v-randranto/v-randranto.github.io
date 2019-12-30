@@ -5,25 +5,25 @@
 //*                     PRINCIPES DU JEU                                                       */
 //*============================================================================================*/ 
 //*  Pour gagner à ce jeu, Arthur doit récupérer les 12 blasons volés par Georges.             */
-//*  Il doit affronter Georges et lui porter des coups pour reprendre des blasons.             */ 
+//*  Il doit affronter Georges et lui porter des coups pour les reprendre progressivement      */ 
 //*  Arthur perd le jeu s'il est encorné par Georges ou s'il cumule 5 gamelles.                */ 
 //*                                                                                            */
 //*  Les coups gagnants :                                                                      */
 //*  --------------------                                                                      */
 //*  1) Georges n'est pas en position d'attaque, Arthur l'attaque et l'atteint :               */
-//*     - de face : 1 blason gagné                                                             */
+//*     - de face : 2 blasons gagnés                                                           */
 //*     - par derrière : 2 blasons gagnés                                                      */
 //*  2) Arthur saute, retombe sur Georges et évite ses cornes : 3 blasons gagnés               */
 //*                                                                                            */
 //*  Les cas de gamelle :                                                                      */
 //*  -------------- -----                                                                      */
 //*  1) Arthur se cogne contre un mur                                                          */
-//*  2) Arthur tamponne Georges sans l'attaquer (sauf coup fatal ci-dessous)                   */  
+//*  2) Arthur percute Georges sans l'attaquer (sauf coup fatal ci-dessous)                    */  
 //*                                                                                            */
 //*  Coup fatal, l'encornage par Georges :                                                     */
 //*  -------------------------------------                                                     */ 
-//*  1) Arthur attaque ou tamponne Georges alors que celui-ci est en position d'attaque        */
-//*  2) Arthur saute et retombe sur les cornes relevées de Geroges                             */
+//*  1) Arthur attaque ou percute Georges alors que celui-ci est en position d'attaque         */
+//*  2) Arthur saute et retombe sur les cornes relevées de Geooges                             */
 //*  Dans ces 2 cas la partie est perdu pour Arthur                                            */
 //*                                                                                            */
 //**********************************************************************************************/
@@ -35,30 +35,32 @@ $(function () {
         window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
     //**********************************************************************************************/
-    //*                                                                                            */
     //*                     LA GESTION DES PERSONNAGES ARTHUR ET GEORGES                           */
-    //*                                                                                            */
     //*============================================================================================*/
     //*                                                                                            */
-    //*  Chaque personnage est représenté par un objet qui contient les principales propriétés     */
-    //*  suivantes :                                                                               */
-    //*  - l'orientation des sprites du personnage                                                 */
-    //*    (les sprites sont tous orientés dans un même sens)                                      */
-    //*  - la direction du déplacement en cours du personnage                                      */
-    //*  et pour chaque action que peut engager le personnage :                                    */ 
-    //*  - une table des positions et tailles des sprites de l'image du personnage                 */
-    //*  - le statut de l'action                                                                   */
-    //*  - le nombre de pixels pour un pas de déplacement                                          */
-    //*  - un booléen qui indique si on reboucle sur le 1er sprite quand on arrive au dernier      */
-    //*  sprite de la table                                                                        */
-    //*  - une vitesse si l'action est déroulée par un setInterval                                 */ 
+    //*  Chaque personnage est représenté par un objet qui contient les propriétés propriétés      */
+    //*  permettant de gérer leur déplacement selon l'action engagée :                             */
+    /*                                                                                            */
+    //*  - l'orientation des sprites du personnage, ceux d'Arthur le sont vers la droite, ceux de  */          //*    Georges vars la gauche                                                                  */
+    //*  - la direction du déplacement en cours                                                    */
+    //*  - pour chaque action que peut engager le personnage :                                     */ 
+    //*    . une table des positions et tailles des sprites appropriés                             */
+    //*    . le statut de l'action                                                                 */
+    //*    . le nombre de pixels pour un pas de déplacement, dans le cas du saut d'Arthur ce sont  */          //*      des radians car c'est un demi-cercle                                                  */
+    //*    . un booléen qui indique si on reboucle sur le 1er sprite quand on arrive au dernier    */
+    //*      sprite de la table                                                                    */
+    //*    . une vitesse si l'action est déroulée avec une fonction setInterval().                 */ 
+    //*                                                                                            */
+    //*  Il y a aussi des méthodes d'initialisation                                                */ 
     //*                                                                                            */
     //**********************************************************************************************/
 
-    //*----------------------------------------------------------------------*/
-    //*  Personnage d'Arthur                                                 */
-    //*  TODO : à completer                                                  */
-    //*----------------------------------------------------------------------*/
+    //*====================================================================*/
+    //*      Arthur                                                        */
+    //*--------------------------------------------------------------------*/
+    //* 3 types d'actions TODO
+    //*====================================================================*/
+
     var ArthurPersonnage = function () {
         this.actionPrecedente = null;
 
@@ -66,22 +68,25 @@ $(function () {
         this.direction = {
             droite: true, gauche: false
         };
-        //les sprites d'Arthur sont tous orientés vers la droite
+        // sprites orientés vers la droite
         this.orientation = 1;
 
+        // Le mouvement d'attaque est déclenché par une touche et est déroulé par un setInterval. Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action
         this.attaque = {
             sprites: [
                 { top: 30, left: -792, width: 118, height: 124 },
             ],
             statut: false,
-            deplacement: 5,
+            pas: 5,
             boucle: true,
             nbBoucles: 30,
             vitesse: 5
         };
 
+        // l'attente est déclenchée quand aucune touche n'est appuyée, elle est déroulée avec un setInterval et s'arrête dès qu'une touche est appuyée
         this.attend = {
             sprites: [
+                // les sprites sont répétés pour ne pas mettre une vitesse trop lente. Quant la vitesse est lente, Arthur parait figé le temps que l'attente se mette en place.
                 { top: 2, left: -2, width: 83, height: 125 },
                 { top: 2, left: -2, width: 83, height: 125 },
                 { top: 2, left: -2, width: 83, height: 125 },
@@ -90,23 +95,25 @@ $(function () {
                 { top: 2, left: -87, width: 83, height: 125 },
             ],
             statut: true,
-            deplacement: 0,
+            pas: 0,
             boucle: true,
             vitesse: 100
         };
 
+        // Le mouvement d'attaque est déclenché par une touche et est déroulé par un setInterval. Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action
         this.content = {
             sprites: [
                 { top: 2, left: -2, width: 83, height: 125 },
                 { top: 2, left: -87, width: 83, height: 125 },
             ],
             statut: false,
-            deplacement: 0,
+            pas: 0,
             boucle: true,
             nbBoucles: 10,
             vitesse: 80
         };
 
+        // Le mouvement de course est déclenché par une touche, à chaque appui Arthur se déplacement d'un pas. Quand on arrive au dernier sprite on reboucle.
         this.court = {
             sprites: [
                 { top: 0, left: -173, width: 86, height: 125 },
@@ -116,12 +123,12 @@ $(function () {
                 { top: 0, left: -521, width: 85, height: 125 }
             ],
             statut: false,
-            deplacement: 5,
+            pas: 5,
             boucle: true,
             vitesse: 0
         };
 
-
+        // Le mouvement mise KO d'Arthur est déclenché quand il y a collision avec les cornes de Georges. Il est déroulé avec un setInterval qui prend fin au dernier sprite.
         this.ko = {
             sprites: [
                 { top: 0, left: -911, width: 96, height: 143 },
@@ -135,12 +142,14 @@ $(function () {
                 { top: -143, left: -627, width: 117, height: 125 },
             ],
             statut: false,
-            deplacement: -4,
+            pas: -4,
             boucle: false,
             vitesse: 100
         };
+        // Le mouvement de saut est déclenché par une touche, déroulé avec un setInterval qui prend fin au dernier sprite. C'est un déplacement en demi-cercle selon le centre, le rayon et l'angle de départ, tous des propritétés du saut. Pour la gestion de la collision avec Georges, on distingue la phase ascendante et la descendante également propriétés du saut. Enfin, le pas est en radians. 
 
         this.saute = {
+            // il n'y a que 2 sprites pour le saut (ascension, descente). Ils sont répétés pour avoir un sprite pour chaque pas de PI/30
             sprites: [
                 { top: 0, left: -611, width: 85, height: 128 },
                 { top: 0, left: -611, width: 85, height: 128 },
@@ -178,22 +187,23 @@ $(function () {
             boucle: false,
             vitesse: 20,
             // les propriétes suivantes permettent de calculer un déplacement en demi-cercle pour faire le saut
-            deplacement: Math.PI / 30,
+            pas: Math.PI / 30,
             x0: 0,
             y0: 0,
-            radian: Math.PI,
+            angle0: Math.PI, // il est initialisé à 2PI quand Arthur va à gauche
             rayon: 142,
             ascension: false,
             descente: false
         };
 
+        // Le vacillement est déclenché quand Arthur percute Georges et déroulé avec un setInterval(). Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action.
         this.vacille = {
             sprites: [
                 { top: 0, left: -911, width: 96, height: 143 },
                 { top: 0, left: -1006, width: 96, height: 143 },
             ],
             statut: false,
-            deplacement: 0,
+            pas: 0,
             boucle: true,
             nbBoucles: 5,
             vitesse: 100
@@ -217,10 +227,12 @@ $(function () {
 
     };
 
-    //*----------------------------------------------------------------------*/
-    //*  Personnage de Georges                                               */
-    //*  TODO : à completer                                                  */
-    //*----------------------------------------------------------------------*/
+    //*============================================================================*/
+    //*      Georges                                                               */
+    //*----------------------------------------------------------------------------*/
+    //*  Les actions de Georges sont déroulées avec des setInterval() avec 
+    //*============================================================================*/
+
     var GeorgesPersonnage = function () {
 
         this.actionPrecedente = null;
@@ -230,8 +242,9 @@ $(function () {
         };
         this.vitesse = 45,
             // les sprites de Georges sont tous orientés vers la gauche
-            this.orientation = -1;
+        this.orientation = -1,
 
+        // Georges s'applatit quant Arthur lui saute sur le dos (collision)
         this.applati = {
             sprites: [
                 { top: -305, left: -832, width: 115, height: 105 },
@@ -244,11 +257,12 @@ $(function () {
                 { top: -317.5, left: -1935, width: 148, height: 95 }
             ],
             statut: false,
-            deplacement: 0,
+            pas: 0,
             boucle: false,
             vitesse: 80
         };
 
+        // Georges attaque quand Arthur est à sa portée
         this.attaque = {
             sprites: [
 
@@ -264,12 +278,13 @@ $(function () {
                 { top: 0, left: -2166, width: 133, height: 91 }
             ],
             statut: false,
-            deplacement: 0,
+            pas: 0,
             boucle: false,
             nbBoucles: 2,
             vitesse: 0
         };
 
+        // Georges attend au début de la partie et de chaque round (mais pas longtemps)
         this.attend = {
             sprites: [
                 { top: -100, left: -2, width: 103, height: 99 },
@@ -289,11 +304,12 @@ $(function () {
                 { top: -100, left: -1472, width: 103, height: 99 }
             ],
             statut: true,
-            deplacement: 0,
+            pas: 0,
             boucle: true,
             vitesse: 50
         };
 
+        // Georges court dès que la partie ou le round démarre, il cesse quand Arthur est à sa portée pour attaquer
         this.court = {
             sprites: [
                 { top: -415, left: -14, width: 101, height: 93 },
@@ -311,11 +327,12 @@ $(function () {
                 { top: -416, left: -1490, width: 101, height: 96 },
             ],
             statut: false,
-            deplacement: 7,
+            pas: 7,
             boucle: true,
             vitesse: 0
         };
 
+        // Georges vacille quand Arthur lui porte un coup de face ou par derrière 
         this.vacille = {
             sprites: [
                 { top: -204, left: -2.5, width: 93, height: 96 },
@@ -330,7 +347,7 @@ $(function () {
                 { top: -100, left: -2, width: 103, height: 99 },
             ],
             statut: false,
-            deplacement: 0,
+            pas: 0,
             boucle: true,
             nbBoucles: 2,
             vitesse: 30
@@ -351,21 +368,25 @@ $(function () {
 
     };
 
-    //****************************************************************************************/
-    //*              GESTION DU SCORE                                                        */
-    //****************************************************************************************/
-    //*   La variable scoreJeu référence un objet dont les propriétés                        */
-    //*   et méthodes permettent de :                                                        */
-    //*   - tenir le score des blasons retrouvés et les gamelles prises                      */
-    //*   - d'afficher le score à chaque modification                                        */
-    //*   - d'afficher par la page proposant de rejouer quand la partie est                  */
-    //*   terminée                                                                           */
-    //*   - d'afficher les blasons (compétences) retrouvés                                   */
-    //*   Les logos blasons sont dans un spritesheet, tous de mêmes dimensions.              */
-    //*   un objet blason, propriété de scoreJeu, contient les dimensions du sprite          */ 
-    //****************************************************************************************/
+    //********************************************************************************************/
+    //                                                                                           */
+    //*                            GESTION DU SCORE                                              */
+    //*                                                                                          */
+    //*==========================================================================================*/
+    //*                                                                                          */
+    //*   La variable scoreJeu référence un objet dont les propriétés et méthodes permettent:    */   
+    //*   - de tenir le score des blasons retrouvés et des gamelles prises                       */
+    //*   - d'afficher le score à chaque modification                                            */
+    //*   - d'afficher la page proposant de rejouer quand la partie est terminée                 */
+    //*   - d'afficher les blasons au fur et à mesure qu'ils sont retrouvés                      */
+    //*                                                                                          */
+    //*   L'image des blasons sont dans une feuille de sprites de mêmes dimensions.              */
+    //*   Un objet blason, propriété de scoreJeu, contient les dimensions d'un sprite            */ 
+    //*                                                                                          */
+    //********************************************************************************************/
 
     var scoreJeu = {
+
         blason: { width: 75, height: 91 },
         nbBlasons: 12,
         nbGamellesMax: 5,
@@ -373,7 +394,6 @@ $(function () {
         nbGamelles: 0,
         gagne: false,
         perdu: false,
-        intervalIdBlasons: null,
 
         // Méthode pour afficher les blasons gagnés suite à une attaque d'Arthur
         afficheBlason: function () {
@@ -420,7 +440,6 @@ $(function () {
             this.nbGamelles = 0;
             this.gagne = false;
             this.perdu = false;
-            this.intervalIdBlasons = null;
         },
 
         // Méthode appelée pour afficher la page proposant de rejouer
@@ -434,7 +453,7 @@ $(function () {
                 sonPerdu.play();
         },
 
-        // Méthode appelée pour mettre fin immédiatement à la partie quand Arthur prend un ko 
+        // Méthode appelée pour mettre fin immédiatement à la partie quand Arthur un coup de cornes 
         rejeuDirect: function () {
             sonGamelle.play();
             this.perdu = true;
@@ -444,7 +463,7 @@ $(function () {
         // Méthode appelée pour repositionner les personnages après une collision ou fin de partie
         repositionPersonnages: function () {
 
-            // La partie est pas terminée
+            // La partie n'est pas terminée
             if ((scoreJeu.perdu) || (scoreJeu.gagne)) {
                 //on repositionne les personnages
                 initPositionPersonnages();
@@ -547,8 +566,8 @@ $(function () {
         // Collision d'Arthur avec les cornes de Georges pendant son saut
         this.checkSautSurCornes = function () {
 
-            
-        // Allez, on s'accorde pour dire que les cornes sont 1/3 de la largeur de Georges
+
+            // Allez, on s'accorde pour dire que les cornes sont 1/3 de la largeur de Georges
             var georgesDataX = this.georgesData.x,
                 georgesDataW = this.georgesData.w / 3;
 
@@ -559,41 +578,33 @@ $(function () {
 
             if (this.arthurData.x + 20 < georgesDataX + georgesDataW &&
                 this.arthurData.x - 20 + this.arthurData.w > georgesDataX &&
-                this.arthurData.y + 20 < this.georgesData.y + this.georgesData.h  &&
+                this.arthurData.y + 20 < this.georgesData.y + this.georgesData.h &&
                 this.arthurData.h - 20 + this.arthurData.y > this.georgesData.y) {
                 this.sautSurCornesGeorges = true;
                 this.avecGeorges = true;
-                console.log("collision sur cornes")
-                console.dir(collision)
-                console.dir(georges)
-                console.dir(arthur)
                 return true;
             }
 
         };
 
         // Collision d'Arthur avec le derrière de Georges pendant son saut
-       
+
         this.checkSautSurDos = function () {
 
-             // le dos est sur 2/3 de la largeur de Georges
+            // le dos est sur 2/3 de la largeur de Georges
             var georgesDataX = this.georgesData.x,
-                georgesDataW = (this.georgesData.w * 2/ 3);
+                georgesDataW = (this.georgesData.w * 2 / 3);
 
             if (georges.direction.gauche) {
                 georgesDataX += this.georgesData.w / 3;
             }
 
             if (this.arthurData.x + 20 < georgesDataX + georgesDataW &&
-                this.arthurData.x - 20 +  this.arthurData.w > georgesDataX &&
+                this.arthurData.x - 20 + this.arthurData.w > georgesDataX &&
                 this.arthurData.y + 20 < this.georgesData.y + this.georgesData.h &&
                 this.arthurData.h - 20 + this.arthurData.y > this.georgesData.y) {
                 this.sautSurDosGeorges = true;
                 this.avecGeorges = true;
-                console.log("collision sur dos")
-                console.dir(collision)
-                console.dir(georges)
-                console.dir(arthur)
                 return true;
             }
 
@@ -649,17 +660,13 @@ $(function () {
 
             // Arthur saute
             if (arthur.saute.statut) {
-                console.log("> collision arthur.saute")
                 if (arthur.saute.ascension) {
-                    console.log("> collision arthur.ascension")
                     if ((arthur.direction.droite !== georges.direction.droite) && georges.attaque.statut) {
-                        console.log("> collision directions =/=, georges attaque, arthur KO")
                         initArthurKo();
                         intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
                         scoreJeu.rejeuDirect();
                         return;
                     }
-                    console.log("> collision directions = ou georges !attaque, arthur vacille")
                     initArthurVacille();
                     intervalIdArthurAction = setInterval(arthurVacille, arthur.vacille.vitesse);
                     georgesAttend();
@@ -670,11 +677,9 @@ $(function () {
                 }
 
                 // Arthur est dans la phase descendante de son saut
-                console.log("> collision arthur.descente")
+
                 //Georges attaque ou n'attaque pas mais Arthur tombe sur son dos
                 if (georges.attaque.statut || (!georges.attaque.statut && collision.sautSurDosGeorges)) {
-                    console.log("> collision georges.attaque ou (!georges.attaque et surCornes)");
-                    console.log("-> arthur content")
                     initArthurContent();
                     intervalIdArthurAction = setInterval(arthurContent, arthur.content.vitesse);
                     initGeorgesApplati()
@@ -682,8 +687,6 @@ $(function () {
                     scoreJeu.incrementBlasons(3);
                     return;
                 }
-                console.log("> collision !georges.attaque et surCornes)");
-                console.log("-> arthur ko")
                 // Arthur tombe sur les cornes 
                 initArthurKo();
                 intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
@@ -794,7 +797,7 @@ $(function () {
         deplacerMasque: function (indice) {
 
             // calcul du déplacement left du masque d'Arthur
-            var deplacementLeft = parseFloat(this.$masque.css('left')) + (this.persoAction.deplacement * this.sensDeplacement);
+            var deplacementLeft = parseFloat(this.$masque.css('left')) + (this.persoAction.pas * this.sensDeplacement);
 
             // on applique au masque les déplacements calculés et les dimensions du sprite du personnage en cours; l'image est affichage selon l'orientation et direction du personnage
             this.$masque.width(this.persoAction.sprites[indice].width).height(this.persoAction.sprites[indice].height).css({
@@ -808,9 +811,9 @@ $(function () {
         deplacerMasqueSaut: function (indice) {
 
             // calcul du déplacement en (left, bottom) du masque d'Arthur
-            var deplacementLeft = this.persoAction.x0 + (this.persoAction.rayon * Math.cos(this.persoAction.radian));
+            var deplacementLeft = this.persoAction.x0 + (this.persoAction.rayon * Math.cos(this.persoAction.angle0));
 
-            var deplacementBottom = this.persoAction.y0 - (this.persoAction.rayon * Math.sin(this.persoAction.radian));
+            var deplacementBottom = this.persoAction.y0 - (this.persoAction.rayon * Math.sin(this.persoAction.angle0));
 
             // on applique au masque les déplacements calculés et les dimensions du sprite d'Arthur en cours; l'image est affichage selon l'orientation et direction d'Arthur
             this.$masque.width(this.persoAction.sprites[indice].width).height(this.persoAction.sprites[indice].height).css({
@@ -819,7 +822,7 @@ $(function () {
             });
 
             // incrément du radian pour la prochaine position
-            this.persoAction.radian += this.persoAction.deplacement * this.sensDeplacement;
+            this.persoAction.angle0 += this.persoAction.pas * this.sensDeplacement;
         },
 
         action: function (personnage, idImage, nomAction, indice) {
@@ -884,7 +887,6 @@ $(function () {
     };
 
     var georgesApplati = function () {
-        console.log(">georgesApplati")
         if (!georges.applati.sprites[indiceGeorges.applati]) {
             clearInterval(intervalIdGeorgesAction);
             indiceGeorges.applati = 0;
@@ -1088,10 +1090,10 @@ $(function () {
         arthur.saute.y0 = parseFloat($arthurMasque.css('bottom'));
         if (arthur.direction.droite) {
             arthur.saute.x0 = parseFloat($arthurMasque.css('left')) + arthur.saute.rayon;
-            arthur.saute.radian = Math.PI;
+            arthur.saute.angle0 = Math.PI;
         } else {
             arthur.saute.x0 = parseFloat($arthurMasque.css('left')) - arthur.saute.rayon;
-            arthur.saute.radian = 2 * Math.PI;
+            arthur.saute.angle0 = 2 * Math.PI;
         }
     }
 
@@ -1111,12 +1113,12 @@ $(function () {
         arthurAction("saute");
 
         if (arthur.direction.droite) {
-            if (arthur.saute.radian >= radianFinAscension) {
+            if (arthur.saute.angle0 >= angleFinAscension) {
                 arthur.saute.ascension = false;
                 arthur.saute.descente = true;
             }
         } else {
-            if (arthur.saute.radian <= radianFinAscension) {
+            if (arthur.saute.angle0 <= angleFinAscension) {
                 arthur.saute.ascension = false;
                 arthur.saute.descente = true;
             }
@@ -1277,9 +1279,6 @@ $(function () {
 
             // test de la collision avec les murs
             if (collision.checkMurs(arthur.direction, $arthurMasque, 20)) {
-                console.log("il y a collision");
-                console.dir(collision);
-                console.dir(arthur);
                 actionsCollision.gereConsequences();
             } else {// tests collisison avec georges
                 collision.initialisation();
@@ -1316,7 +1315,6 @@ $(function () {
             if (clavier.actif) {
                 clavier.reinitTouches();
                 if (actionArthurAttend) {
-                    console.log("keyup: actionArthur déjà en cours !!!");
                     // TODO: trouver pourquoi
                     clearInterval(intervalIdArthurAction);
                     actionArthurAttend = false;
@@ -1504,7 +1502,7 @@ $(function () {
     var collision = new Collision();
     var actionsCollision = new ActionsCollision();
 
-    var radianFinAscension = Math.PI + Math.PI / 2;
+    var angleFinAscension = Math.PI + Math.PI / 2;
 
     // pour Arthur
     var arthur = new ArthurPersonnage();
