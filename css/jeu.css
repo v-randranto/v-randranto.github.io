@@ -146,11 +146,11 @@ header {
 }
 
 #rdj div:nth-child(1) {
-    width: 30%;    
+    width: 50%;    
 }
 
 #rdj div:nth-child(2) {
-    width: 50%;
+    width: 35%;
 }
 
 .regles {
