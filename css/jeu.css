@@ -130,13 +130,13 @@ header {
 #scene {
     position: relative;
     top: 0;
-    left: 15%;
+    left: 20%;
     background-image: url('../images/cave_jeu_2.jpg');
     background-size: cover;
     color: ivory;
     box-shadow: 0px 0px 15px #050100;
     border-radius: 20px;
-    width: 70%;
+    width: 65%;
 }
 
 #rdj {

@@ -1516,7 +1516,7 @@ $(function () {
     var nbBouclesVacille = georges.vacille.nbBoucles;
     var intervalIdGeorgesAction = null;
     var intervalIdDeplacementGeorges = null;
-    var distanceLimiteAttaque = 100;
+    var distanceLimiteAttaque = 85;
 
     var DecisionAttaque = function () {
         this.attaqueOk = false;
