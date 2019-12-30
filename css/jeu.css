@@ -1,15 +1,15 @@
-/**************************************/
-/*   ELEMENTS COMMUNS AUX PAGES HTML  */
-/**************************************/
+/****************************************************/
+/*        ELEMENTS COMMUNS AUX PAGES HTML           */
+/****************************************************/
 
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: darkolivegreen;
 }
 
-/*-------------------------*/
-/* en-tête et pied-de-page */
-/*-------------------------*/
+/*=================================*/
+/*    En-tête et pied-de-page      */
+/*=================================*/
 
 header {
     text-decoration: none;
@@ -27,9 +27,10 @@ article {
     overflow: auto;
 }
 
-/*-------------*/
-/* les boutons */
-/*-------------*/
+
+/*=================================*/
+/*         Les boutons             */
+/*=================================*/
 
 button {
     cursor: pointer;
@@ -69,9 +70,9 @@ button:focus {
     margin: auto;
 }
 
-/**************************/
-/*      PAGE HTML INDEX   */
-/**************************/
+/****************************************************/
+/*              PAGE HTML INDEX                     */
+/****************************************************/
 
 #presentation {
     display: flex;
@@ -81,9 +82,7 @@ button:focus {
 #presentation article {
     background-color: peachpuff;
     border-radius: 20px;
-
-    box-shadow: 0px 0px 15px #050100;
-    ;
+    box-shadow: 0px 0px 15px #050100;    ;
     margin: 20px;
     padding: 30px 40px;
     color: black;
@@ -99,60 +98,33 @@ button:focus {
 }
 
 #onjoue {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-    grid-row-gap: 50px;
-    justify-items: center;
+    display: flex;
+    justify-content: space-around;
     align-items: center;
+    margin : 20px 0;
 }
-
-#arthurAttend {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-
-}
-
-#lienJouer {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-
-}
-
-#georgesAttend {
-    grid-column: 3 / 4;
-    grid-row: 1 / 2;
+#versCv {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;    
+    margin : 20px 0;
 }
 
 #texteLienCv1 {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-    justify-self: right;
+    width: 51%;
 }
 
-#lienMonCv {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-
+#lienMoncv {
+    margin: 0 25px; 
 }
 
-#texteLienCv2 {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-}
+/****************************************************/
+/*              PAGE HTML JEU                       */
+/****************************************************/
 
-/**************************/
-/*      PAGE HTML JEU     */
-/**************************/
 header {
     display: flex;
     justify-content: space-around;
-}
-
-#jeu {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
 }
 
 #scene {
@@ -163,50 +135,104 @@ header {
     background-size: cover;
     color: ivory;
     box-shadow: 0px 0px 15px #050100;
-    ;
     border-radius: 20px;
     width: 70%;
 }
 
 #rdj {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: auto;
-    align-items: center;
-    padding: 20px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
 }
 
 #rdj div:nth-child(1) {
-    grid-column: 1 / 7;
-    grid-row: 1 / 2;
-
+    width: 30%;
+    
 }
 
 #rdj div:nth-child(2) {
-    grid-column: 7 / 13;
-    grid-row: 1 / 2;
+    width: 50%;
 }
 
-#arthurSaute {
-    grid-column: 4 / 6;
-    grid-row: 2 / 3;
-    justify-self: center;
+.regles {
+    margin: 20px;
 }
 
-#rdj button {
-    grid-column: 6 / 8;
-    grid-row: 2 / 3;
+#onyva {
+    display: flex;    
+    justify-content: space-around;
+    align-items: center;
+    margin : 0;
+    width: 50%;
 }
 
-#georgesAttaque {
-    grid-column: 8 / 10;
-    grid-row: 2 / 3;
-    justify-self: left;
-}
+/*=====================================================*/
+/*        Partie espace de jeu                         */
+/*-----------------------------------------------------*/
+/*  Elle est affichée quand on clique le bouton        */
+/*  "baston" pour commencer la partie                  */                        
+/*=====================================================*/
 
 #jouer {
     display: none;
 }
+
+/*   Sprites et masques des personnages  */
+
+#arthur,
+#georges {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#arthurMasque,
+#georgesMasque {
+    position: absolute;
+    bottom: 50px;
+    left: 0px;
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+}
+
+/* Affichage des blasons */
+
+#blasonsConteneur {
+    width: 900px;
+    margin: auto;
+}
+
+#blasonsMasque {
+    width: 0px;
+    height:91px;
+    overflow: hidden;
+}
+
+/* Affichage du score */
+
+#score {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5rem;
+    padding: 50px;
+}
+
+#nbBlasons,
+#nbGamelles {
+
+    font-size: 1.5rem;
+    color: ivory;
+    font-size: 2rem;
+    font-weight: bolder;
+    text-align: center;
+}
+
+/*=====================================================*/
+/*    Partie de la page proposant de rejouer           */
+/*-----------------------------------------------------*/
+/*  Elle est affichée quand la partie est terminée     */
+/*=====================================================*/
 
 #rejouer {
     display: none;
@@ -231,43 +257,6 @@ header {
     width: 200px;
 }
 
-#btnTest {
-    display: none;
-}
-
-/*------------------------*/
-/*  Score et compétences  */
-/*------------------------*/
-
-#blasonsConteneur {
-    width: 900px;
-    margin: auto;
-}
-
-#blasonsMasque {
-    width: 0px;
-    height:91px;
-    overflow: hidden;
-}
-
-#score {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.5rem;
-    margin: 20px;
-}
-
-#nbBlasons,
-#nbGamelles {
-
-    font-size: 1.5rem;
-    color: ivory;
-    font-size: 2rem;
-    font-weight: bolder;
-    text-align: center;
-}
-
-
 /**************************/
 /*      PAGE HTML CV      */
 /**************************/
@@ -282,27 +271,4 @@ header {
 
 iframe {
     border: 4px solid #050100;
-    border-radius: 20px;
-}
-
-
-/***************************************/
-/*  IMAGES ET MASQUES DES PERSONNAGES  */
-/***************************************/
-
-#arthur,
-#georges {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-#arthurMasque,
-#georgesMasque {
-    position: absolute;
-    bottom: 20px;
-    left: 0px;
-    width: 0px;
-    height: 0px;
-    overflow: hidden;
 }

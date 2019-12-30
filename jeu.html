@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="./css/jeu.css">
 </head>
 
+<!-- 
+    La page html "jeu" affiche les règles du jeu et propose à l'utilisateur de jouer ou d'aller vers le CV.
+
+    Elle comporte 3 parties :
+    - une page expliquant les règles du jeu et affichant les boutons pour jouer et aller vers le CV
+    - une page affichant l'espace où se déroule le jeu
+    - une page proposant de rejouer après la fin d'une partie
+    Ces pages s'affichent et disparaissent selon les choix de l'utilisateur.
+
+    Des boutons de retour à l'accueil et d'accès au CV sont disponibles dans ces pages.
+ -->
+
 <body>
 
     <header>
@@ -14,19 +26,22 @@
         <h2>Véronique Randranto - Développeuse fullstack JavaScript</h2>
         <a href="moncv.html"><button class="moncv">mon CV</button> </a>
     </header>
-    <div id="blasonsConteneur">
-        <div id="blasonsMasque">
-            <img id="blasons" src="images/blasons.png" alt="blasons">
-        </div>
-    </div>
 
     <section id="jeu">
 
+        <div id="blasonsConteneur">
+            <div id="blasonsMasque">
+                <img id="blasons" src="images/blasons.png" alt="blasons">
+            </div>
+        </div>
+
         <div id="scene">
 
-            <!-- affichage page "règles du jeu"  -->
+            <!-- 
+                Page des règles du jeu : elle disparaît quand on clique "jouer"
+            -->
             <article id="rdj">
-                <div>
+                <div class="regles">
                     <h2>Comment jouer ?</h2>
                     <ul>
                         Utiliser les touches :
@@ -36,7 +51,8 @@
                         <li>Espace : attaque sournoise</li>
                     </ul>
                 </div>
-                <div>
+
+                <div class="regles">
                     <h2>Score</h2>
                     <p>Arthur doit récupérer 12 blasons :</p>
                     <ul>
@@ -51,14 +67,17 @@
 
                 </div>
 
-                <img id="arthurSaute" src="images/arthur_saute.gif" alt="Arthur" width="80">
-                <button id="btnJouer" class="baston">baston</button>
-                <img id="georgesAttaque" src="images/georges_attaque.gif" alt="Georges" width="130">
-
+                <div id="onyva">
+                    <img id="arthurSaute" src="images/arthur_saute.gif" alt="Arthur" width="80">
+                    <button id="btnJouer" class="baston">baston</button>
+                    <img id="georgesAttaque" src="images/georges_attaque.gif" alt="Georges" width="130">
+                </div>
 
             </article>
 
-            <!-- affichage page "jouer" -->
+            <!-- 
+                 Page de l'espace de jeu : elle est affichée quand on clique "jouer"  
+            -->
             <div id='jouer'>
                 <div id="score">
                     <div id="blasons"> Blasons<br><span id="nbBlasons"></span></div>
@@ -74,7 +93,9 @@
 
             </div>
 
-            <!-- affichage page "rejouer" -->
+            <!-- 
+                Page de rejeu : elle est affichée quand la partie est terminée, en opacité par dessus l'espace de jeu
+            -->
             <div id="rejouer">
                 <div>
                     <p id="resultat"></p>

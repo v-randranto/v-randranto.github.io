@@ -1461,7 +1461,7 @@ $(function () {
     var hauteur = $(window).height();
 
     $('#index').height(hauteur - hauteur * 17 / 100);
-    $('#jeu').height(hauteur - hauteur * 35 / 100);
+    $('#jeu').height(hauteur - hauteur * 19 / 100);
     $('#scene').height(hauteur - hauteur * 35 / 100);
     $('#iframeCv').height(hauteur - hauteur * 18 / 100);
 
@@ -1613,7 +1613,7 @@ $(function () {
         //---------
         arthur.initDirection(true, false);
         initIndicesArthur();
-        $arthurMasque.css({ left: positionArthur }, { bottom: '20px' });
+        $arthurMasque.css({ left: positionArthur }, { bottom: '50px' });
 
         // Georges
         //----------
