@@ -8,20 +8,13 @@
 </head>
 
 <!-- 
-    La page html "index" est la page d'accueil du site.
-    Elle affiche des boutons permettant d'accéder au jeu ou directement au CV.
- -->
-
-<!-- 
-    La page html "jeu" affiche les règles du jeu et propose à l'utilisateur de jouer ou d'aller vers le CV.
-
-    Elle comporte 3 parties :
-    - une page expliquant les règles du jeu et affichant les boutons pour jouer et aller vers le CV
-    - une page affichant l'espace où se déroule le jeu
-    - une page proposant de rejouer après la fin d'une partie
+    La page html "index" comporte 4 parties :
+    1- une page d'accueil présentant le jeu CV et proposant de jouer ou d'aller directement vers le CV
+    2- une page expliquant les règles du jeu et permettant de démarrer le jeu
+    3- une page affichant l'espace dans lequel se déroule le jeu et qui intègre l'affichage du score; les blasons sont affichés au-dessus de cet espace
+    4- une page proposant de rejouer après la fin d'une partie
+    
     Ces pages s'affichent et disparaissent selon les choix de l'utilisateur.
-
-    Des boutons de retour à l'accueil et d'accès au CV sont disponibles dans ces pages.
  -->
 
 <body>
@@ -36,8 +29,11 @@
         <h2>Véronique Randranto - Développeuse fullstack JavaScript</h2>
     </header>
 
+    <!-- 
+     1- LA PAGE ACCUEIL
+     -->
 
-    <div id="index">
+    <div id="accueil">
 
         <div id="presentation">
 
@@ -71,7 +67,8 @@
                 <div id="versCv">
                     <p id="texteLienCv1">Si vous n'avez pas le temps parce que vous avez piscine...
                     </p>
-                    <a id="lienMoncv" href="moncv.html"><button class="monCv">mon CV</button> </a>
+                    <!-- l'utilisation d'un <button> dans un <a> n'est pas W3C valide => utilisation d'un <span>  -->
+                    <a id="lienMoncv" href="moncv.html"><span class="monCv">mon CV</span> </a>
                     <p id="texteLienCv2">... vous pouvez aller directement à mon cv.
                     </p>
                 </div>
@@ -81,6 +78,10 @@
         </div>
 
     </div>
+
+    <!-- 
+     2- LA PAGE DE JEU
+     -->
 
     <div id="jeu">
 
@@ -93,7 +94,7 @@
         <div id="scene">
 
             <!-- 
-                Page des règles du jeu : elle disparaît quand on clique "jouer"
+               2a- Les règles du jeu : 
             -->
             <article id="rdj">
 
@@ -106,8 +107,7 @@
                         <li>attaque aérienne, c'est-à-dire, saut sur Georges : 3 blasons.
                         </li>
                     </ul>
-                    <p> Mais attention aux cornes du Georges ! Le jeu est perdu si Arthur prend un coup de cornes,
-                        pareillement s'il cumule 5 gamelles.</p>
+                    <p> Mais attention aux cornes du Georges ! Le jeu est perdu si Arthur est encorné, pareillement s'il cumule 5 gamelles.</p>
                     <p>Il y a gamelle quand Arthur se cogne au mur ou percute Georges.
                     </p>
 
@@ -133,7 +133,7 @@
             </article>
 
             <!-- 
-                 Page de l'espace de jeu : elle est affichée quand on clique "jouer"  
+               2b- le jeu : 
             -->
             <div id='jouer'>
                 <div id="score">
@@ -151,7 +151,7 @@
             </div>
 
             <!-- 
-                Page de rejeu : elle est affichée quand la partie est terminée, en opacité par dessus l'espace de jeu
+               2c- Page de rejeu : elle est affichée quand la partie est terminée, en opacité par dessus l'espace de jeu
             -->
             <div id="rejouer">
                 <div>
@@ -164,7 +164,7 @@
     </div>
 
     <footer>
-        Free game assets from bevouliin.com
+        Free assets from bevouliin.com and uihere.com
     </footer>
 
     <div id="sons">

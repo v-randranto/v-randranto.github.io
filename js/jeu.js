@@ -1623,14 +1623,14 @@ $(function () {
 
     var hauteur = $(window).height();
 
-    $('#index').height(hauteur - hauteur * 17 / 100);
+    $('#accueil').height(hauteur - hauteur * 17 / 100);
     $('#jeu').height(hauteur - hauteur * 19 / 100);
-    $('#scene').height(hauteur - hauteur * 35 / 100);
+    $('#scene').height(hauteur - hauteur * 40 / 100);
     $('#iframeCv').height(hauteur - hauteur * 18 / 100);
 
     $('#btnJouer').click(function () {
 
-        $('#index').css('display', 'none');
+        $('#accueil').css('display', 'none');
         $('#jeu').css('display', 'block');       
         $('#imgHome').css('display', 'block');
         $('#imgMonCv').css('display', 'block');
