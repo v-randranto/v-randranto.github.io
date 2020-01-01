@@ -8,18 +8,39 @@
 </head>
 
 <!-- 
-    La page html "index" est la page d'accueil présentant le pitch du jeu.
+    La page html "index" est la page d'accueil du site.
     Elle affiche des boutons permettant d'accéder au jeu ou directement au CV.
  -->
 
+<!-- 
+    La page html "jeu" affiche les règles du jeu et propose à l'utilisateur de jouer ou d'aller vers le CV.
+
+    Elle comporte 3 parties :
+    - une page expliquant les règles du jeu et affichant les boutons pour jouer et aller vers le CV
+    - une page affichant l'espace où se déroule le jeu
+    - une page proposant de rejouer après la fin d'une partie
+    Ces pages s'affichent et disparaissent selon les choix de l'utilisateur.
+
+    Des boutons de retour à l'accueil et d'accès au CV sont disponibles dans ces pages.
+ -->
+
 <body>
+    <img id="imgToileGauche" src="images/araignee_toile_gauche.png" alt="toile araignée">
+    <img id="imgToileDroite" src="images/araignee_toile_droite.png" alt="toile araignée" width="300">
+    <a id="imgHome" href="index.html"><img src="images/araignee_accueil.png" alt="Bouton accueil" title="Accueil"
+            width="120"></a>
+    <a id="imgMonCv" href="moncv.html"><img src="images/araignee_cv_b.png" alt="Bouton CV" title="Mon CV"
+            width="190"></a>
 
     <header>
         <h2>Véronique Randranto - Développeuse fullstack JavaScript</h2>
     </header>
 
-    <section id="index">
+
+    <div id="index">
+
         <div id="presentation">
+
             <article class="pitch">
                 <h2>Bonjour !</h2>
                 <p>Je suis une formation de développeur Javascript à l'IFOCOP et je vous propose de découvrir les
@@ -27,10 +48,12 @@
                     de la formation. </p>
 
                 <h2>Le pitch du jeu</h2>
-                <p> Georges est une grosse araignée velue qui adore collectionner toutes sortes de babioles. Il n'est plus à un larcin près lorsqu'il s'agit d'en amasser. </p>
+                <p> Georges est une grosse araignée velue qui adore collectionner toutes sortes de babioles. Il n'est
+                    plus à un larcin près lorsqu'il s'agit d'en amasser. </p>
                 <p>
                     Voilà donc qu'il s'est emparé des blasons durement acquis pendant ma formation !</p>
-                <p> Heureusement pour moi, mon bon copain Arthur a une âme d'aventurier. Il a décidé de se lancer à la reconquête de mes précieux et, si cela vous agrée, vous pourrez l'aider.</p>
+                <p> Heureusement pour moi, mon bon copain Arthur a une âme d'aventurier. Il a décidé de se lancer à la
+                    recherche de mes précieux et, si cela vous agrée, vous pourrez l'aider.</p>
 
             </article>
 
@@ -39,16 +62,16 @@
                 <h2>On joue ?</h2>
                 <p>Arthur a trouvé le repaire de Georges.</p>
 
-                <div id="onjoue">                                        
+                <div id="onjoue">
                     <img id="arthurAttend" src="images/arthur_attend.gif" alt="Arthur" width="80">
-                    <a id="lienJouer" href="jeu.html"><button class="jouer">jouer</button></a>
+                    <button id="btnJouer" class="jouer">jouer</button>
                     <img id="georgesAttend" src="images/georges_attend.gif" alt="Georges" width="100">
                 </div>
 
-                <div id="versCv">                
+                <div id="versCv">
                     <p id="texteLienCv1">Si vous n'avez pas le temps parce que vous avez piscine...
                     </p>
-                    <a id="lienMoncv" href="moncv.html"><button class="moncv">mon CV</button> </a>
+                    <a id="lienMoncv" href="moncv.html"><button class="monCv">mon CV</button> </a>
                     <p id="texteLienCv2">... vous pouvez aller directement à mon cv.
                     </p>
                 </div>
@@ -56,12 +79,102 @@
             </article>
 
         </div>
-        
-    </section>
+
+    </div>
+
+    <div id="jeu">
+
+        <div id="blasonsConteneur">
+            <div id="blasonsMasque">
+                <img src="images/blasons.png" alt="blasons">
+            </div>
+        </div>
+
+        <div id="scene">
+
+            <!-- 
+                Page des règles du jeu : elle disparaît quand on clique "jouer"
+            -->
+            <article id="rdj">
+
+                <div class="regles">
+                    <h2>Comment gagner ?</h2>
+                    <p>Arthur doit récupérer 12 blasons :</p>
+                    <ul>
+                        <li>attaque frontale : 2 blasons</li>
+                        <li>attaque à l'arrière : 1 blason</li>
+                        <li>attaque aérienne, c'est-à-dire, saut sur Georges : 3 blasons.
+                        </li>
+                    </ul>
+                    <p> Mais attention aux cornes du Georges ! Le jeu est perdu si Arthur prend un coup de cornes,
+                        pareillement s'il cumule 5 gamelles.</p>
+                    <p>Il y a gamelle quand Arthur se cogne au mur ou percute Georges.
+                    </p>
+
+                </div>
+
+                <div class="regles">
+                    <h2>Et il fait ça comment Arthur ?</h2>
+                    <p> Utilisez les touches :</p>
+                    <ul id="touches">
+                        <li>&larr; : course à gauche</li>
+                        <li>&rarr; : course à droite</li>
+                        <li>&uarr; : saut gracieux</li>
+                        <li>Espace : attaque sournoise</li>
+                    </ul>
+                </div>
+
+                <div id="onyva">
+                    <img id="arthurSaute" src="images/arthur_saute.gif" alt="Arthur" width="80">
+                    <button id="btnBaston" class="baston">baston</button>
+                    <img id="georgesAttaque" src="images/georges_attaque.gif" alt="Georges" width="130">
+                </div>
+
+            </article>
+
+            <!-- 
+                 Page de l'espace de jeu : elle est affichée quand on clique "jouer"  
+            -->
+            <div id='jouer'>
+                <div id="score">
+                    <div id="blasons"> Blasons<br><span id="nbBlasons"></span></div>
+                    <div id="gamelles">Gamelles <br><span id="nbGamelles"></span></div>
+                </div>
+                <div id="arthurMasque">
+                    <img id="arthur" src="images/arthur.png" alt="sprite d'Arthur">
+                </div>
+
+                <div id="georgesMasque">
+                    <img id="georges" src="images/georges.png" alt="sprite de george">
+                </div>
+
+            </div>
+
+            <!-- 
+                Page de rejeu : elle est affichée quand la partie est terminée, en opacité par dessus l'espace de jeu
+            -->
+            <div id="rejouer">
+                <div>
+                    <p id="resultat"></p>
+                    <button id="btnBaston2" class="baston">baston again</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
     <footer>
         Free game assets from bevouliin.com
     </footer>
+
+    <div id="sons">
+        <audio id="sonJouer" src="ressources/tabla.mp3"></audio>
+        <audio id="sonBlason" src="ressources/djembe.mp3"></audio>
+        <audio id="sonGamelle" src="ressources/djembe.mp3"></audio>
+        <audio id="sonGagne" src="ressources/hourrah.mp3"></audio>
+        <audio id="sonPerdu" src="ressources/c_triste.mp3"></audio>
+
+    </div>
 
     <script src="vendor/jquery/jquery.js"></script>
     <script src="js/jeu.js"></script>

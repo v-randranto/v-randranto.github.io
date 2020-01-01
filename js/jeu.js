@@ -193,7 +193,8 @@ $(function () {
             angle0: Math.PI, // il est initialisé à 2PI quand Arthur va à gauche
             rayon: 142,
             ascension: false,
-            descente: false
+            descente: false,
+            angleFinAscension: Math.PI + Math.PI / 2
         };
 
         // Le vacillement est déclenché quand Arthur percute Georges et déroulé avec un setInterval(). Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action.
@@ -240,27 +241,27 @@ $(function () {
         this.direction = {
             droite: false, gauche: true
         };
-        this.vitesse = 45,
+        this.vitesse = 42,
             // les sprites de Georges sont tous orientés vers la gauche
-        this.orientation = -1,
+            this.orientation = -1,
 
-        // Georges s'applatit quant Arthur lui saute sur le dos (collision)
-        this.applati = {
-            sprites: [
-                { top: -305, left: -832, width: 115, height: 105 },
-                { top: -305, left: -987, width: 122, height: 105 },
-                { top: -307, left: -1143, width: 128, height: 102 },
-                { top: -307, left: -1303, width: 133, height: 102 },
-                { top: -322, left: -1460, width: 139, height: 89.5 },
-                { top: -320, left: -1620, width: 139, height: 89.5 },
-                { top: -317.5, left: -1775, width: 143, height: 96 },
-                { top: -317.5, left: -1935, width: 148, height: 95 }
-            ],
-            statut: false,
-            pas: 0,
-            boucle: false,
-            vitesse: 80
-        };
+            // Georges s'applatit quant Arthur lui saute sur le dos (collision)
+            this.applati = {
+                sprites: [
+                    { top: -305, left: -832, width: 115, height: 105 },
+                    { top: -305, left: -987, width: 122, height: 105 },
+                    { top: -307, left: -1143, width: 128, height: 102 },
+                    { top: -307, left: -1303, width: 133, height: 102 },
+                    { top: -322, left: -1460, width: 139, height: 89.5 },
+                    { top: -320, left: -1620, width: 139, height: 89.5 },
+                    { top: -317.5, left: -1775, width: 143, height: 96 },
+                    { top: -317.5, left: -1935, width: 148, height: 95 }
+                ],
+                statut: false,
+                pas: 0,
+                boucle: false,
+                vitesse: 80
+            };
 
         // Georges attaque quand Arthur est à sa portée
         this.attaque = {
@@ -278,7 +279,7 @@ $(function () {
                 { top: 0, left: -2166, width: 133, height: 91 }
             ],
             statut: false,
-            pas: 0,
+            pas: 1,
             boucle: false,
             nbBoucles: 2,
             vitesse: 0
@@ -420,7 +421,7 @@ $(function () {
                 this.nbBlasonsRetrouves = this.nbBlasons;
                 this.gagne = true;
             }
-            sonBlason.play();
+            son.blason.play();
             this.afficheBlason();
             this.afficheScore();
         },
@@ -431,7 +432,7 @@ $(function () {
             if (this.nbGamelles == this.nbGamellesMax) {
                 this.perdu = true;
             }
-            sonGamelle.play();
+            son.gamelle.play();
             this.afficheScore();
         },
 
@@ -448,14 +449,14 @@ $(function () {
             afficherPageRejeu();
             $('#resultat').html(resultat);
             if (this.gagne)
-                sonGagne.play();
+                son.gagne.play();
             else
-                sonPerdu.play();
+                son.perdu.play();
         },
 
         // Méthode appelée pour mettre fin immédiatement à la partie quand Arthur un coup de cornes 
         rejeuDirect: function () {
-            sonGamelle.play();
+            son.gamelle.play();
             this.perdu = true;
             this.afficheScore();
         },
@@ -474,7 +475,7 @@ $(function () {
             if (collision.avecGeorges) {
                 //on repositionne les personnages
                 initPositionPersonnages();
-                intervalIdDeplacementGeorges = setInterval(gestionDeplacementGeorges, georges.vitesse);
+                intervalIdDeplacementGeorges = setInterval(deplacementGeorges, georges.vitesse);
             }
 
             // réactivation du clavier, cela permet de mettre Arthur automatiquement en attente.
@@ -761,19 +762,22 @@ $(function () {
 
     }
 
-    //*****************************************************************************/
-    //**                 GESTION DEPLACEMENT D'UN SPRITE                         **/
-    //*****************************************************************************/
-    // l'objet unMouvementSprite permet de gérer un 'pas' de déplacement pour Arthur et Georges, à savoir:
-    // - se positionner sur le sprite à afficher
-    // - déplacer le masque du sprite.
-    //
-    // Sa méthode 'action' est le moteur du déplacement. C'est elle qui est invoquée pour 
-    // que le personnage effectue un 'pas':
-    // - elle récupère l'objet personnage, son image de sprites (via son id), 
-    // le nom de l'action en cours et l'indice du sprite à afficher pour l'action en cours.
-    // - elle lance les méthodes qui permettent d'effectuer le 'pas' de déplacement
-    //--------------------------------------------------------------------------------- */
+    //*******************************************************************************************************/
+    //*                            GESTION DEPLACEMENT D'UN SPRITE                                          */
+    //======================================================================================================*/
+    //                                                                                                      */
+    //  l'objet unMouvementSprite permet de gérer un 'pas' de déplacement pour Arthur et Georges, à savoir: */
+    //  - se positionner sur le sprite à afficher                                                           */
+    //  - déplacer le masque du sprite.                                                                     */
+    //                                                                                                      */
+    //  Sa méthode 'action' est le moteur du déplacement. C'est elle qui est invoquée pour que le           */ 
+    //  personnage effectue un 'pas':                                                                       */
+    //  - elle récupère l'objet personnage, son image de sprites (via son id), le nom de l'action en cours  */
+    //  et l'indice du sprite à afficher pour l'action en cours.                                            */
+    //  - elle lance les méthodes qui permettent d'effectuer le 'pas' de déplacement                        */
+    //                                                                                                      */
+    //*******************************************************************************************************/
+
     var unMouvementSprite = {
         nomAction: null,
         persoAction: null,
@@ -842,80 +846,12 @@ $(function () {
 
     };
 
-    //************************************/
-    //*   GESTION DEPLACEMENTS GEORGES   */
-    //************************************/
 
-    var indiceGeorges = {
-        attend: 0,
-        court: 0,
-        saute: 0,
-        attaque: 0,
-        vacille: 0,
-        ko: 0
-    };
-    var initIndicesGeorges = function () {
-        indiceGeorges.applati = 0;
-        indiceGeorges.attaque = 0;
-        indiceGeorges.attend = 0;
-        indiceGeorges.court = 0;
-        indiceGeorges.vacille = 0;
-    }
-
-    var georgesAction = function (nomAction) {
-        //quand on arrive au dernier sprite de l'action on reboucle sur le 1er 
-        if (!georges[nomAction].sprites[indiceGeorges[nomAction]]) {
-            indiceGeorges[nomAction] = 0;
-        }
-
-        //Si c'est une nouvelle action on met à jour les propriétés actionPrecedente et le statut correspondant 
-        if (nomAction !== georges.actionPrecedente) {
-            indiceGeorges[georges.actionPrecedente] = 0;
-            georges[georges.actionPrecedente].statut = false;
-            georges.actionPrecedente = nomAction;
-            georges[nomAction].statut = true;
-
-        }
-
-        //Le personnage de georges effectue un pas de déplacement
-        unMouvementSprite.action(georges, "#georges", nomAction, indiceGeorges[nomAction]);
-        indiceGeorges[nomAction]++;
-    }
-
-    var initGeorgesApplati = function () {
-        georges.applati.statut = true;
-    };
-
-    var georgesApplati = function () {
-        if (!georges.applati.sprites[indiceGeorges.applati]) {
-            clearInterval(intervalIdGeorgesAction);
-            indiceGeorges.applati = 0;
-            return;
-        }
-        georgesAction("applati");
-    };
-
-    var georgesAttend = function () {
-        clearInterval(intervalIdGeorgesAction);
-        georges.initStatuts();
-        georges.attend.statut = true;
-        intervalIdGeorgesAction = setInterval(function () {
-            georgesAction("attend")
-        }, georges.attend.vitesse);
-    };
-
-    var georgesVacille = function () {
-        clearInterval(intervalIdGeorgesAction);
-        georges.initStatuts();
-        georges.vacille.statut = true;
-        intervalIdGeorgesAction = setInterval(function () {
-            georgesAction("vacille")
-        }, georges.vacille.vitesse);
-    };
-
-    //***********************************/
-    //**  GESTION DEPLACEMENTS ARTHUR  **/
-    //***********************************/
+    //*******************************************************************************************************/
+    //*                            GESTION DEPLACEMENT D'ARTHUR                                             */
+    //======================================================================================================*/
+    //*                                                                         */
+    //*******************************************************************************************************/
 
     // indices des actions d'Arthur
     var indiceArthur = {
@@ -1113,12 +1049,12 @@ $(function () {
         arthurAction("saute");
 
         if (arthur.direction.droite) {
-            if (arthur.saute.angle0 >= angleFinAscension) {
+            if (arthur.saute.angle0 >= arthur.saute.angleFinAscension) {
                 arthur.saute.ascension = false;
                 arthur.saute.descente = true;
             }
         } else {
-            if (arthur.saute.angle0 <= angleFinAscension) {
+            if (arthur.saute.angle0 <= arthur.saute.angleFinAscension) {
                 arthur.saute.ascension = false;
                 arthur.saute.descente = true;
             }
@@ -1164,89 +1100,6 @@ $(function () {
         arthurAction("vacille");
         decompteVacille--;
     };
-
-    //*********************************************************************************/
-    //*                                                                               */
-    //*       FONCTIONS POUR LES DEPLACEMENTS D'ARTHUR         */   
-    //*       TODO : compléter les commentaires                */ 
-    //*                                                                               */
-    //*********************************************************************************/
-
-    //*========================================================*/
-    //*  Gestion du clavier et des touches                     */    
-    //*========================================================*/
-
-    //------------------------------------------------------------------/
-    //  Les touches de déplacement d'Arthur sont :
-    //  - flêche --> : aller à droite 
-    //  - flêche <-- : aller à gauche
-    //  - flêche ^| : saut
-    //  - barre espace : attaque
-    //
-    //  Les touches de déplacement appuyées sont flaguées avec un booléen
-    //------------------------------------------------------------------/
-
-    var clavier = {
-        actif: false,
-        touches: {
-            gauche: false,
-            haut: false,
-            droite: false,
-            bas: false,
-            entree: false,
-            espace: false,
-            keyup: false
-        },
-        dateDerniereTouche: 0,
-        reinitTouches: function () {
-            this.touches.gauche = false;
-            this.touches.droite = false;
-            this.touches.haut = false;
-            this.touches.bas = false;
-            this.touches.entree = false;
-            this.touches.espace = false;
-            this.touches.keyup = false;
-        },
-        uneToucheAppuyee: function () {
-            return this.touches.gauche ||
-                this.touches.droite ||
-                this.touches.haut ||
-                this.touches.bas ||
-                this.touches.entree ||
-                this.touches.espace;
-        }
-    };
-
-    //----------------------------------------------------------/
-    //  Détection de l'appui d'une touche de déplacement :     /
-    //  - celle-ci est flagué à "true"                          /
-    //----------------------------------------------------------/
-
-    $(window).keydown(function (e) {
-
-        if (clavier.actif) {
-            clavier.touches.keyup = false;
-            switch (e.which) {
-
-                case 32:
-                    clavier.touches.espace = true;
-                    break;
-                case 37:
-                    clavier.touches.gauche = true;
-                    break;
-                case 38:
-                    clavier.touches.haut = true;
-                    break;
-                case 39:
-                    clavier.touches.droite = true;
-                    break;
-            };
-        }
-    });
-
-    $(window).keyup(function () {
-        clavier.touches.keyup = true;
-    });
 
     //*=========================================================================*/
     //*  requestAnimationFrame :                                                */ 
@@ -1331,14 +1184,82 @@ $(function () {
         rafIdTouches = requestAnimationFrame(gestionTouches);
 
     };
-    //*********************************************************************************/
-    //*                                                                               */
-    //*       FONCTIONS POUR LES DEPLACEMENTS DE GEORGES         */   
-    //*       TODO : compléter les commentaires                */ 
-    //*                                                                               */
-    //*********************************************************************************/
 
-    var gestionDeplacementGeorges = function () {
+    //*******************************************************************************************************/
+    //*                            GESTION DEPLACEMENT DE GEORGES                                           */
+    //======================================================================================================*/
+    //*                                                                         */
+    //*******************************************************************************************************/
+
+    var indiceGeorges = {
+        attend: 0,
+        court: 0,
+        saute: 0,
+        attaque: 0,
+        vacille: 0,
+        ko: 0
+    };
+    var initIndicesGeorges = function () {
+        indiceGeorges.applati = 0;
+        indiceGeorges.attaque = 0;
+        indiceGeorges.attend = 0;
+        indiceGeorges.court = 0;
+        indiceGeorges.vacille = 0;
+    }
+
+    var georgesAction = function (nomAction) {
+        //quand on arrive au dernier sprite de l'action on reboucle sur le 1er 
+        if (!georges[nomAction].sprites[indiceGeorges[nomAction]]) {
+            indiceGeorges[nomAction] = 0;
+        }
+
+        //Si c'est une nouvelle action on met à jour les propriétés actionPrecedente et le statut correspondant 
+        if (nomAction !== georges.actionPrecedente) {
+            indiceGeorges[georges.actionPrecedente] = 0;
+            georges[georges.actionPrecedente].statut = false;
+            georges.actionPrecedente = nomAction;
+            georges[nomAction].statut = true;
+
+        }
+
+        //Le personnage de georges effectue un pas de déplacement
+        unMouvementSprite.action(georges, "#georges", nomAction, indiceGeorges[nomAction]);
+        indiceGeorges[nomAction]++;
+    }
+
+    var initGeorgesApplati = function () {
+        georges.applati.statut = true;
+    };
+
+    var georgesApplati = function () {
+        if (!georges.applati.sprites[indiceGeorges.applati]) {
+            clearInterval(intervalIdGeorgesAction);
+            indiceGeorges.applati = 0;
+            return;
+        }
+        georgesAction("applati");
+    };
+
+    var georgesAttend = function () {
+        clearInterval(intervalIdGeorgesAction);
+        georges.initStatuts();
+        georges.attend.statut = true;
+        intervalIdGeorgesAction = setInterval(function () {
+            georgesAction("attend")
+        }, georges.attend.vitesse);
+    };
+
+    var georgesVacille = function () {
+        clearInterval(intervalIdGeorgesAction);
+        georges.initStatuts();
+        georges.vacille.statut = true;
+        intervalIdGeorgesAction = setInterval(function () {
+            georgesAction("vacille")
+        }, georges.vacille.vitesse);
+    };
+
+
+    var deplacementGeorges = function () {
         clearInterval(intervalIdGeorgesAction);
 
         var georgesAGauche = $georgesMasque.offset().left < $arthurMasque.offset().left;
@@ -1361,8 +1282,8 @@ $(function () {
         var conditionAttaque = Math.abs(georgesX - arthurX) < distanceLimiteAttaque &&
             !conditionDemiTour;
 
-        // Georges fait un demi-tour quand il a Arthur derrière lui mais seulement si Arthur n'est pas en train de sauter
-        if (conditionDemiTour && !arthur.saute.statut && timer.on) {
+        // Georges fait un demi-tour quand il a Arthur derrière lui mais seulement si Arthur n'est pas en train de sauter. Pour que le demi-tour ne soit systématique, un flag booleen qui le conditionne change de valeur toutes les 2,5s
+        if (conditionDemiTour && !arthur.saute.statut && flagDemiTour) {
             georges.direction.droite = !georges.direction.droite;
             georges.direction.gauche = !georges.direction.gauche;
         }
@@ -1446,26 +1367,12 @@ $(function () {
 
     }
 
+
     //**************************************************************************/
     //*                                                                        */
     //*    INITIALISATION A L'ARRIVEE SUR L'APPLICATION                        */
     //*                                                                        */
     //**************************************************************************/
-
-    //*======================================================================*/
-    //* Ajustement de l'affichage des pages htm                              */
-    //*======================================================================*/
-
-    var hauteur = $(window).height();
-
-    $('#index').height(hauteur - hauteur * 17 / 100);
-    $('#jeu').height(hauteur - hauteur * 19 / 100);
-    $('#scene').height(hauteur - hauteur * 35 / 100);
-    $('#iframeCv').height(hauteur - hauteur * 18 / 100);
-
-    var $jouer = $('#jouer');
-    var $jouerPos = $jouer.offset()
-    $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.width());
 
     // fonctions pour calculer les positions des personnages aléatoirement (merci MDN)
     var nbAleatoire = function (min, max) {
@@ -1490,7 +1397,6 @@ $(function () {
         return positions;
     }
 
-
     //*==========================================*/
     //*     Déclaration des variables            */
     //*==========================================*/
@@ -1502,7 +1408,7 @@ $(function () {
     var collision = new Collision();
     var actionsCollision = new ActionsCollision();
 
-    var angleFinAscension = Math.PI + Math.PI / 2;
+   // var angleFinAscension = Math.PI + Math.PI / 2;
 
     // pour Arthur
     var arthur = new ArthurPersonnage();
@@ -1513,9 +1419,14 @@ $(function () {
     // pour Georges
     var $georgesMasque = $('#georgesMasque');
     var georges = new GeorgesPersonnage();
-    var nbBouclesVacille = georges.vacille.nbBoucles;
     var intervalIdGeorgesAction = null;
     var intervalIdDeplacementGeorges = null;
+
+    var flagDemiTour = false;
+    setInterval(function () {
+        flagDemiTour = !flagDemiTour;
+    }, 2000);
+
     var distanceLimiteAttaque = 85;
 
     var DecisionAttaque = function () {
@@ -1540,11 +1451,14 @@ $(function () {
 
     // pour le score
     var $blasonsMasque = $('#blasonsMasque');
-    var sonJouer = document.getElementById("sonJouer");
-    var sonBlason = document.getElementById('sonBlason');
-    var sonGamelle = document.getElementById('sonGamelle');
-    var sonGagne = document.getElementById('sonGagne');
-    var sonPerdu = document.getElementById('sonPerdu');
+
+    var son = {
+        jouer: document.getElementById("sonJouer"),
+        blason: document.getElementById('sonBlason'),
+        gamelle: document.getElementById('sonGamelle'),
+        gagne: document.getElementById('sonGagne'),
+        perdu: document.getElementById('sonPerdu')
+    }
 
     //*===========================================================================*/
     //*         POSITIONNEMENT DES PERSONNAGES                                    */
@@ -1561,22 +1475,6 @@ $(function () {
     //* - le clavier doit désactivé, il sera réactivé si choix de rejouer         */
     //*===========================================================================*/
 
-    // applique une temporisation
-    var delai = function (duree) {
-        var debut = Date.now(),
-            fin = Date.now();
-        while (fin - debut < duree) {
-            fin = Date.now();
-        }
-    };
-
-    var timer = {
-        on: false
-    }
-
-    setInterval(function () {
-        timer.on = !timer.on;
-    }, 2500);
 
     // mise en mouvement des personnages  
     var miseEnMouvementPersonnages = function () {
@@ -1623,7 +1521,6 @@ $(function () {
         // Mise en mouvement des personnages
         miseEnMouvementPersonnages();
 
-
     }
 
     // initialisation des propriétés des variables objet
@@ -1643,6 +1540,70 @@ $(function () {
     //*    L'UTILISATEUR A DECIDE DE JOUER    */
     //*---------------------------------------*/
 
+    //**************************************************************************/
+    //*                    GESTION DES EVENEMENTS                              */
+    //=========================================================================*/
+    //*                                                                        */
+    //**************************************************************************/
+
+    var clavier = {
+        actif: false,
+        touches: {
+            gauche: false,
+            haut: false,
+            droite: false,
+            bas: false,
+            entree: false,
+            espace: false,
+            keyup: false
+        },
+        dateDerniereTouche: 0,
+        reinitTouches: function () {
+            this.touches.gauche = false;
+            this.touches.droite = false;
+            this.touches.haut = false;
+            this.touches.bas = false;
+            this.touches.entree = false;
+            this.touches.espace = false;
+            this.touches.keyup = false;
+        },
+        uneToucheAppuyee: function () {
+            return this.touches.gauche ||
+                this.touches.droite ||
+                this.touches.haut ||
+                this.touches.bas ||
+                this.touches.entree ||
+                this.touches.espace;
+        }
+    };
+
+    $(window).keydown(function (e) {
+
+        if (clavier.actif) {
+            clavier.touches.keyup = false;
+            switch (e.which) {
+
+                case 32:
+                    clavier.touches.espace = true;
+                    break;
+                case 37:
+                    clavier.touches.gauche = true;
+                    break;
+                case 38:
+                    clavier.touches.haut = true;
+                    break;
+                case 39:
+                    clavier.touches.droite = true;
+                    break;
+            };
+        }
+    });
+
+    $(window).keyup(function () {
+        clavier.touches.keyup = true;
+    });
+
+
     // fonction d'affichage de l'espace de jeu dans la page jeu.html
     var initStylePageJeu = function () {
         $('#rdj').css('display', 'none');
@@ -1655,10 +1616,34 @@ $(function () {
         $('#rejouer').css('display', 'block').height($('#scene').height()).width($('#scene').width());
     }
 
-    var $jouer = $('#btnJouer');
-    $jouer.click(function () {
+    
+    //*-------------------------------------------*/
+    //*  Ajustement de l'affichage des pages htm  */  
+    //*-------------------------------------------*/
 
-        sonJouer.play();
+    var hauteur = $(window).height();
+
+    $('#index').height(hauteur - hauteur * 17 / 100);
+    $('#jeu').height(hauteur - hauteur * 19 / 100);
+    $('#scene').height(hauteur - hauteur * 35 / 100);
+    $('#iframeCv').height(hauteur - hauteur * 18 / 100);
+
+    $('#btnJouer').click(function () {
+
+        $('#index').css('display', 'none');
+        $('#jeu').css('display', 'block');       
+        $('#imgHome').css('display', 'block');
+        $('#imgMonCv').css('display', 'block');
+
+        var $jouer = $('#jouer');
+        var $jouerPos = $jouer.offset();
+        $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.width());
+
+    });
+
+    $('#btnBaston').click(function () {
+
+        son.jouer.play();
 
         initialisationVariables();
 
@@ -1672,14 +1657,13 @@ $(function () {
         gestionTouches();
 
         clearInterval(intervalIdGeorgesAction);
-        intervalIdDeplacementGeorges = setInterval(gestionDeplacementGeorges, georges.vitesse);
+        intervalIdDeplacementGeorges = setInterval(deplacementGeorges, georges.vitesse);
 
     });
 
-    var $rejouer = $('#btnJouer2');
-    $rejouer.click(function () {
+    $('#btnBaston2').click(function () {
 
-        sonJouer.play();
+        son.jouer.play();
 
         initialisationVariables();
 
@@ -1690,7 +1674,7 @@ $(function () {
         initPositionPersonnages();
 
         clearInterval(intervalIdGeorgesAction);
-        intervalIdDeplacementGeorges = setInterval(gestionDeplacementGeorges, georges.vitesse);
+        intervalIdDeplacementGeorges = setInterval(deplacementGeorges, georges.vitesse);
 
     });
 

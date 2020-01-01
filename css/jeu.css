@@ -1,17 +1,35 @@
+
 /****************************************************/
-/*        ELEMENTS COMMUNS AUX PAGES HTML           */
+/*              PAGE HTML INDEX                     */
 /****************************************************/
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background-color: darkolivegreen;
+    background-color: darkslategray;
+    background-size: cover;
+}
+
+/*===========================================================*/
+/*    Toiles d'araignée affichées dans les coins de l'écran  */
+/*===========================================================*/
+
+#imgToileGauche, #imgToileDroite {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+}
+#imgToileGauche {
+    left: 0;
+}
+#imgToileDroite {
+    right: 0;
 }
 
 /*=================================*/
 /*    En-tête et pied-de-page      */
 /*=================================*/
 
-header {
+header { 
     text-decoration: none;
     color: ivory;
     text-align: center;
@@ -29,7 +47,7 @@ article {
 
 
 /*=================================*/
-/*         Les boutons             */
+/*         Les boutons et liens    */
 /*=================================*/
 
 button {
@@ -52,27 +70,34 @@ button:focus {
     margin: auto;
 }
 
-.moncv {
-    background-color: DARKCYAN;
-    color: purple;
-    margin: auto;
-}
-
-.home {
-    background-color: green;
-    color: ivory;
-    margin: auto;
-}
-
 .jouer {
     background-color: orange;
     color: yellow;
     margin: auto;
 }
 
-/****************************************************/
-/*              PAGE HTML INDEX                     */
-/****************************************************/
+.monCv {
+    background-color: DARKCYAN;
+    color: purple;
+    margin: auto;
+}
+
+#imgHome, #imgMonCv {
+    display: none;
+    position: absolute;
+}
+#imgHome {
+    top: -15px;
+    left: 10%;
+}
+#imgMonCv {
+    top: 0px;
+    right: 8%;
+}
+
+/*============================================*/
+/*   Accueil: présentation du jeu             */
+/*============================================*/
 
 #presentation {
     display: flex;
@@ -80,7 +105,7 @@ button:focus {
 }
 
 #presentation article {
-    background-color: peachpuff;
+    background-color: tan;
     border-radius: 20px;
     box-shadow: 0px 0px 15px #050100; 
     margin: 20px;
@@ -118,9 +143,13 @@ button:focus {
     margin: 0 25px; 
 }
 
-/****************************************************/
-/*              PAGE HTML JEU                       */
-/****************************************************/
+/*===============================*/
+/*   Page des règles du jeu      */
+/*===============================*/
+
+#jeu {
+    display: none;
+}
 
 header {
     display: flex;
@@ -130,11 +159,12 @@ header {
 #scene {
     position: relative;
     top: 0;
-    left: 20%;
+    left: 17.5%;
     background-image: url('../images/cave_jeu_2.jpg');
     background-size: cover;
     color: ivory;
-    box-shadow: 0px 0px 15px #050100;
+    /* box-shadow: 0px 0px 15px #050100; */
+    border: 4px solid tan;
     border-radius: 20px;
     width: 65%;
 }
@@ -156,6 +186,7 @@ header {
 .regles {
     margin-top: 20px;
 }
+
 #touches li {
     list-style-type: none ;
     margin-left: -10px;
@@ -170,12 +201,9 @@ header {
     width: 50%;
 }
 
-/*=====================================================*/
-/*        Partie espace de jeu                         */
-/*-----------------------------------------------------*/
-/*  Elle est affichée quand on clique le bouton        */
-/*  "baston" pour commencer la partie                  */                        
-/*=====================================================*/
+/*======================*/
+/*   Page de jeu        */
+/*======================*/
 
 #jouer {
     display: none;
@@ -224,7 +252,6 @@ header {
 
 #nbBlasons,
 #nbGamelles {
-
     font-size: 1.5rem;
     color: ivory;
     font-size: 2rem;
@@ -232,11 +259,9 @@ header {
     text-align: center;
 }
 
-/*=====================================================*/
-/*    Partie de la page proposant de rejouer           */
-/*-----------------------------------------------------*/
-/*  Elle est affichée quand la partie est terminée     */
-/*=====================================================*/
+/*====================================*/
+/*    Page proposant de rejouer       */
+/*====================================*/
 
 #rejouer {
     display: none;
@@ -264,15 +289,13 @@ header {
 /**************************/
 /*      PAGE HTML CV      */
 /**************************/
-
 #cv {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    width: 60%;
-    margin-left: 13%;
+    margin: auto;
 }
 
 iframe {
-    border: 4px solid #050100;
+    border: 4px solid tan;
 }
