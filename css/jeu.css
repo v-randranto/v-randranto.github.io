@@ -98,20 +98,32 @@ button,
     margin: auto;
 }
 
-#imgHome,
-#imgMonCv {
-    display: none;
-    position: absolute;
-}
-
 #imgHome {
-    top: -15px;
+    position:absolute;
+    top: -150px;
     left: 10%;
 }
 
 #imgMonCv {
-    top: 0px;
+    position:absolute;
+    top: -180px;
     right: 8%;
+}
+
+#imgMonCv.pendule {
+    animation: penduler 1S ease-in-out 4;
+}
+
+@keyframes penduler {
+    from {
+        top: 0;
+    }
+    50% {
+        top: -20px;
+    }
+    to {
+        top: 0px;
+    }
 }
 
 /*============================================*/
@@ -149,6 +161,14 @@ button,
     margin: 20px 0;
 }
 
+#arthurAttend {
+margin-left: 50px;
+}
+
+#georgesAttend {
+margin-right: 50px;
+}
+
 #versCv {
     display: flex;
     justify-content: space-around;
@@ -180,14 +200,13 @@ header {
 #scene {
     position: relative;
     top: 0;
-    left: 17.5%;
+    left: 20%;
     background-image: url('../images/cave_jeu_2.jpg');
     background-size: cover;
     color: ivory;
-    /* box-shadow: 0px 0px 15px #050100; */
     border: 4px solid tan;
     border-radius: 20px;
-    width: 65%;
+    width: 60%;
 }
 
 #rdj {
@@ -197,11 +216,11 @@ header {
 }
 
 #rdj div:nth-child(1) {
-    width: 50%;
+    width: 52%;
 }
 
 #rdj div:nth-child(2) {
-    width: 35%;
+    width: 37%;
 }
 
 .regles {
@@ -226,9 +245,10 @@ header {
 /*   Page de jeu        */
 /*======================*/
 
-#jouer {
+#jouer{
     display: none;
 }
+
 
 /*   Sprites et masques des personnages  */
 
@@ -295,7 +315,8 @@ header {
 #rejouer>div {
     font-size: 2rem;
     width: 200px;
-    margin: 100px auto;
+    margin-top: 100px;
+    margin-left: 45%;
 }
 
 .boutonsVertical {

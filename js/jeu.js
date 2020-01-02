@@ -448,10 +448,12 @@ $(function () {
             var resultat = this.gagne ? "Gagné !" : "Perdu !";
             afficherPageRejeu();
             $('#resultat').html(resultat);
-            if (this.gagne)
+            if (this.gagne) {
                 son.gagne.play();
-            else
-                son.perdu.play();
+            } else { 
+                son.perdu.play(); 
+            }            
+            $('#imgMonCv').toggleClass('pendule');
         },
 
         // Méthode appelée pour mettre fin immédiatement à la partie quand Arthur un coup de cornes 
@@ -1408,7 +1410,7 @@ $(function () {
     var collision = new Collision();
     var actionsCollision = new ActionsCollision();
 
-   // var angleFinAscension = Math.PI + Math.PI / 2;
+    // var angleFinAscension = Math.PI + Math.PI / 2;
 
     // pour Arthur
     var arthur = new ArthurPersonnage();
@@ -1616,7 +1618,7 @@ $(function () {
         $('#rejouer').css('display', 'block').height($('#scene').height()).width($('#scene').width());
     }
 
-    
+
     //*-------------------------------------------*/
     //*  Ajustement de l'affichage des pages htm  */  
     //*-------------------------------------------*/
@@ -1631,13 +1633,17 @@ $(function () {
     $('#btnJouer').click(function () {
 
         $('#accueil').css('display', 'none');
-        $('#jeu').css('display', 'block');       
+        $('#jeu').css('display', 'block');
         $('#imgHome').css('display', 'block');
         $('#imgMonCv').css('display', 'block');
 
         var $jouer = $('#jouer');
         var $jouerPos = $jouer.offset();
-        $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.width());
+        $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.innerWidth());
+
+        $('#imgHome').animate({ top: "-15px" }, 1700);
+        $('#imgMonCv').delay(500).animate({ top: "0px" }, 1700);
+
 
     });
 
@@ -1662,6 +1668,8 @@ $(function () {
     });
 
     $('#btnBaston2').click(function () {
+
+        $('#imgMonCv').toggleClass('pendule');
 
         son.jouer.play();
 
