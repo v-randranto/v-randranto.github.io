@@ -766,20 +766,26 @@ $(function () {
     }
 
     //*******************************************************************************************************/
-    //*                            GESTION DEPLACEMENT D'UN SPRITE                                          */
-    //======================================================================================================*/
+    //*                            GESTION DU DEPLACEMENT DES PERSONNAGES                                   */
+    //*=====================================================================================================*/
     //                                                                                                      */
-    //  l'objet unMouvementSprite permet de gérer un 'pas' de déplacement pour Arthur et Georges, à savoir: */
-    //  - se positionner sur le sprite à afficher                                                           */
-    //  - déplacer le masque du sprite.                                                                     */
+    //*******************************************************************************************************/
+
+
+    //*=====================================================================================================*/
+    //*                           Déplacement d'un 'pas'                                                    */
+    //*-----------------------------------------------------------------------------------------------------*/
+    //  La variable "unMouvementSprite" permet de gérer un 'pas' de déplacement d'Arthur et de Georges.     */
+    //  Elle référence un objet dont les propriétés et méthodes permettent:                                 */
+    //  - de se positionner sur le sprite à afficher selon l'action en cours                                */
+    //  - de déplacer le masque du sprite.                                                                  */
     //                                                                                                      */
     //  Sa méthode 'action' est le moteur du déplacement. C'est elle qui est invoquée pour que le           */ 
     //  personnage effectue un 'pas':                                                                       */
     //  - elle récupère l'objet personnage, son image de sprites (via son id), le nom de l'action en cours  */
     //  et l'indice du sprite à afficher pour l'action en cours.                                            */
-    //  - elle lance les méthodes qui permettent d'effectuer le 'pas' de déplacement                        */
-    //                                                                                                      */
-    //*******************************************************************************************************/
+    //  - elle lance les méthodes qui permettent d'effectuer le 'pas'.                                      */
+    //*=====================================================================================================*/
 
     var unMouvementSprite = {
         nomAction: null,
@@ -793,7 +799,7 @@ $(function () {
             this.sensDeplacement = personnage.direction.droite ? 1 : -1;
             this.orientation = personnage.orientation;
         },
-        // accès au sprite de l'action à afficher
+         
         accederImageSprite: function (indice) {
             this.$image.css({
                 top: this.persoAction.sprites[indice].top,
@@ -806,7 +812,7 @@ $(function () {
             // calcul du déplacement left du masque d'Arthur
             var deplacementLeft = parseFloat(this.$masque.css('left')) + (this.persoAction.pas * this.sensDeplacement);
 
-            // on applique au masque les déplacements calculés et les dimensions du sprite du personnage en cours; l'image est affichage selon l'orientation et direction du personnage
+            // on applique au masque les déplacements calculés et les dimensions du sprite du personnage en cours; l'image est affichée selon les orientation et direction du personnage
             this.$masque.width(this.persoAction.sprites[indice].width).height(this.persoAction.sprites[indice].height).css({
                 transform: 'scaleX(' + (this.sensDeplacement * this.orientation) + ')',
                 left: deplacementLeft
@@ -832,6 +838,7 @@ $(function () {
             this.persoAction.angle0 += this.persoAction.pas * this.sensDeplacement;
         },
 
+        // cette méthode pilote les methodes à invoquer pour le déplacement
         action: function (personnage, idImage, nomAction, indice) {
 
             this.nomAction = nomAction;
@@ -850,11 +857,11 @@ $(function () {
     };
 
 
-    //*******************************************************************************************************/
-    //*                            GESTION DEPLACEMENT D'ARTHUR                                             */
-    //======================================================================================================*/
+    //*=====================================================================================================*/
+    //*                            GESTION DES DEPLACEMENTS D'ARTHUR                                        */
+    //*-----------------------------------------------------------------------------------------------------*/
     //*                                                                         */
-    //*******************************************************************************************************/
+    //*=====================================================================================================*/
 
     // indices des actions d'Arthur
     var indiceArthur = {
@@ -1191,7 +1198,7 @@ $(function () {
     //*******************************************************************************************************/
     //*                            GESTION DEPLACEMENT DE GEORGES                                           */
     //======================================================================================================*/
-    //*                                                                         */
+    //*                                                                                                     */
     //*******************************************************************************************************/
 
     var indiceGeorges = {
@@ -1539,15 +1546,25 @@ $(function () {
 
     }
 
-    //*---------------------------------------*/
-    //*    L'UTILISATEUR A DECIDE DE JOUER    */
-    //*---------------------------------------*/
+    //*******************************************************************************************************/
+    //*                                GESTION DES EVENEMENTS                                               */
+    //*******************************************************************************************************/
 
-    //**************************************************************************/
-    //*                    GESTION DES EVENEMENTS                              */
-    //=========================================================================*/
-    //*                                                                        */
-    //**************************************************************************/
+    //*=====================================================================================================*/
+    //*                                Déplacement d'Arthur avec les touches                                */
+    //*-----------------------------------------------------------------------------------------------------*/
+    //*  Arthur se déplace en fonction de l'appui des touches directionnelles et la barre espace.           */
+    //*                                                                                                     */
+    //*  Les écouteurs d'événement "keydown" et "keyup" sont mis en place pour détecter l'appui de ces      */
+    //*  touches.                                                                                           */
+    //*                                                                                                     */
+    //*  La variable "clavier" référence un objet dont les propriétés et méthodes permettent :              */
+    //*  - de gérer un flag booléen attachée à chaque touche de déplacement pour savoir si elle est appuyée */
+    //*    ou non                                                                                           */ 
+    //*  - de savoir si une touche de déplacement quelconque est appuyée                                    */
+    //*  - d'activer ou désactiver le clavier, càd de prendre en compte ou non l'appui sur une touche de    */
+    //*    déplacement.                                                                                     */
+    //*=====================================================================================================*/
 
     var clavier = {
         actif: false,
@@ -1555,17 +1572,14 @@ $(function () {
             gauche: false,
             haut: false,
             droite: false,
-            bas: false,
             entree: false,
             espace: false,
             keyup: false
         },
-        dateDerniereTouche: 0,
         reinitTouches: function () {
             this.touches.gauche = false;
             this.touches.droite = false;
             this.touches.haut = false;
-            this.touches.bas = false;
             this.touches.entree = false;
             this.touches.espace = false;
             this.touches.keyup = false;
@@ -1574,7 +1588,6 @@ $(function () {
             return this.touches.gauche ||
                 this.touches.droite ||
                 this.touches.haut ||
-                this.touches.bas ||
                 this.touches.entree ||
                 this.touches.espace;
         }
@@ -1606,24 +1619,36 @@ $(function () {
         clavier.touches.keyup = true;
     });
 
+    //*=====================================================================================================*/
+    //*                                Déroulement du jeu                                                   */
+    //*-----------------------------------------------------------------------------------------------------*/
+    //*  Trois écouteurs sont attachés aux clics des boutons "jouer", "baston", "baston again".             */
+    //*                                                                                                     */ 
+    //*  "jouer" dans la page d'accueil:                                                                    */
+    //*  - on affiche la page de jeu avec les règles et le bouton "baston".                                 */
+    //*                                                                                                     */ 
+    //*  "baston" dans la page de jeu avec les règles:                                                      */
+    //*  - les règles disparaissent et on affiche les personnages, le score et les blasons retrouvés        */
+    //*  - quand la partie prend fin, la page de rejeu se superpose en opacité: elle affiche le résultat,   */
+    //*    perte ou gain, et le bouton "baston again" pour rejouer.                                         */
+    //*                                                                                                     */
+    //*  "baston again" dans la page de rejeu:                                                              */
+    //*  - la page de rejeu disparait et une nouvelle partie démarre.                                       */
+    //*=====================================================================================================*/
 
-    // fonction d'affichage de l'espace de jeu dans la page jeu.html
+    // Fonction pour cacher les règles du jeu et la page de rejeu et afficher/réafficher les éléments et protagonistes du jeu  
     var initStylePageJeu = function () {
         $('#rdj').css('display', 'none');
         $('#jouer').css('display', 'block');
         $('#rejouer').css('display', 'none');
     }
 
-    // fonctions d'affichage de la page de rejeu dans la page jeu.html
+    // Fonction d'affichage de la page de rejeu
     var afficherPageRejeu = function () {
         $('#rejouer').css('display', 'block').height($('#scene').height()).width($('#scene').width());
     }
-
-
-    //*-------------------------------------------*/
-    //*  Ajustement de l'affichage des pages htm  */  
-    //*-------------------------------------------*/
-
+    
+    //  Ajustement des affichages à la hauteur de la fenêtre de l'écran  
     var hauteur = $(window).height();
 
     $('#accueil').height(hauteur - hauteur * 17 / 100);
@@ -1631,19 +1656,31 @@ $(function () {
     $('#scene').height(hauteur - hauteur * 40 / 100);
     $('#iframeCv').height(hauteur - hauteur * 18 / 100);
 
+    //------------------------------------------------------------/
+    //  Evénement clic sur bouton "jouer" de la page d'accueil    / 
+    //------------------------------------------------------------/ 
+
     $('#btnJouer').click(function () {
 
+        // La page d'accueil disparaît, affichage de la page de jeu
         $('#accueil').css('display', 'none');
         $('#jeu').css('display', 'block');
 
         var $jouer = $('#jouer');
         var $jouerPos = $jouer.offset();
+
+        // Calage de la page de rejeu à l'espace de jeu à laquelle elles se superpose
         $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.innerWidth());
 
+        // Apparition des liens vers l'accueil et vers le CV
         $('#imgHome').animate({ top: "-15px" }, 1700);
         $('#imgMonCv').delay(500).animate({ top: "0px" }, 1700);       
 
     });
+
+    //----------------------------------------------------------------------/
+    //  Evénement clic sur bouton "baston" de la page de jeu/règle du jeu   / 
+    //----------------------------------------------------------------------/ 
 
     $('#btnBaston').click(function () {
 
@@ -1651,7 +1688,7 @@ $(function () {
 
         initialisationVariables();
 
-        // on cache les règles du jeu et on affiche l'espace de jeu
+        // Cacher les règles du jeu et afficher les éléments et protagonistes du jeu
         initStylePageJeu();
 
         //  Positionnement et mise en mouvement des personnages
@@ -1665,15 +1702,19 @@ $(function () {
 
     });
 
+    //----------------------------------------------------------------------/
+    //  Evénement clic sur bouton "baston again" de la page de jeu/rejeu    / 
+    //----------------------------------------------------------------------/ 
     $('#btnBaston2').click(function () {
 
+        // on stoppe l'animation du lien vers le CV
         $('#imgMonCv').removeClass('yoyo');
 
         son.jouer.play();
 
         initialisationVariables();
 
-        // on cache les règles du jeu et on affiche l'espace de jeu
+        // Cacher les règles du jeu et afficher les éléments et protagonistes du jeu
         initStylePageJeu();
 
         //  Positionnement et mise en mouvement des personnages

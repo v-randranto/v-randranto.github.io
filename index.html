@@ -8,13 +8,12 @@
 </head>
 
 <!-- 
-    La page html "index" comporte 4 parties :
-    1- une page d'accueil présentant le jeu CV et proposant de jouer ou d'aller directement vers le CV
-    2- une page expliquant les règles du jeu et permettant de démarrer le jeu
-    3- une page affichant l'espace dans lequel se déroule le jeu et qui intègre l'affichage du score; les blasons sont affichés au-dessus de cet espace
-    4- une page proposant de rejouer après la fin d'une partie
-    
-    Ces pages s'affichent et disparaissent selon les choix de l'utilisateur.
+    La page html "index" comporte 2 parties :
+    1- la page d'accueil présentant le jeu CV et proposant de jouer ou d'aller directement vers le CV
+    2- la page de jeu comporte 3 sous-parties :
+        2a- expliquant les règles du jeu et permettant de démarrer le jeu
+        2b- affichant l'espace dans lequel se déroule le jeu et qui intègre l'affichage du score; les blasons sont affichés au-dessus de cet espace
+        2c- proposant de rejouer après la fin du jeu
  -->
 
 <body>
@@ -23,25 +22,16 @@
     <img id="imgToileGauche" src="images/araignee_toile_gauche.png" alt="toile araignée">
     <img id="imgToileDroite" src="images/araignee_toile_droite.png" alt="toile araignée" width="300">
 
-    <!-- lien de retour vers l'accueil -->
-    <a id="imgHome" href="index.html"><img src="images/araignee_accueil.png" alt="Bouton accueil" title="Accueil"
-            width="120"></a>
-
-    <!-- lien vers la page CV -->
-    <a id="imgMonCv" href="moncv.html"><img src="images/araignee_cv_b.png" alt="Bouton CV" title="Mon CV"
-            width="190"></a>
-
-
     <header>
-        <a id="imgLinkedIn" href="https://www.linkedin.com/in/v-randranto/"><img src="images/linkedin.png"
-                alt="lien linkedIn" title="lien linkedIn" target="_blank" width="35"></a>
+        <a id="imgLinkedIn" href="https://www.linkedin.com/in/v-randranto/" target="_blank"><img
+                src="images/linkedin.png" alt="lien linkedIn" width="35"></a>
         <h2>Véronique Randranto - Développeuse fullstack JavaScript</h2>
-        <a id="imgGithub" href="https://github.com/v-randranto"><img src="images/github.png" alt="lien github"
-                title="lien github" target="_blank" width="45"></a>
+        <a id="imgGithub" href="https://github.com/v-randranto" target="_blank"><img src="images/github.png"
+                alt="lien github" width="45"></a>
     </header>
 
     <!-- 
-     1- LA PAGE ACCUEIL
+     1- la page d'accueil présente le jeu et propose de jouer ou d'aller directement au cv. Elle s'efface pour laisser place à la page de jeu quand on clique sur "jouer"
      -->
 
     <div id="accueil">
@@ -91,10 +81,17 @@
     </div>
 
     <!-- 
-     2- LA PAGE DE JEU
+     2- La page de jeu affiche l'espace de jeu: la grotte de Georges. Les liens de retour accueil et vers le cv apparaissent à l'affichage. Les règles du jeu sont affichées.
      -->
 
     <div id="jeu">
+
+        <!-- lien de retour vers l'accueil -->
+        <a id="imgHome" href="index.html"><img src="images/araignee_accueil_b.png" alt="Bouton accueil" title="Accueil" width="125"></a>
+
+        <!-- lien vers la page CV -->
+        <a id="imgMonCv" href="moncv.html"><img src="images/araignee_cv_b.png" alt="Bouton CV" title="Mon CV"
+                width="190"></a>
 
         <div id="blasonsConteneur">
             <div id="blasonsMasque">
@@ -105,7 +102,7 @@
         <div id="scene">
 
             <!-- 
-               2a- Les règles du jeu : 
+               2a- Affichage des règles du jeu et du bouton "baston" pour démarrer le jeu. Cet affichage disparait quand on clique sur le bouton "baston".
             -->
             <article id="rdj">
 
@@ -145,7 +142,7 @@
             </article>
 
             <!-- 
-               2b- le jeu : 
+               2a- Affichage des personnages, du score et des blasons retrouvés
             -->
             <div id='jouer'>
                 <div id="score">
@@ -163,7 +160,7 @@
             </div>
 
             <!-- 
-               2c- Page de rejeu : elle est affichée quand la partie est terminée, en opacité par dessus l'espace de jeu
+               2c- Affichage de la page de rejeu quand la partie est terminée, en opacité par dessus l'espace de jeu. Elle disparaît quand on clique sur le bouton "baston again" pour une nouvelle partie.
             -->
             <div id="rejouer">
                 <div>
@@ -179,6 +176,7 @@
         Free assets from bevouliin.com and uihere.com
     </footer>
 
+    <!-- sons utilisés pendant une partie de jeu -->
     <div id="sons">
         <audio id="sonJouer" src="ressources/tabla.mp3"></audio>
         <audio id="sonBlason" src="ressources/djembe.mp3"></audio>

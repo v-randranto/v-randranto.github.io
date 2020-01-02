@@ -105,13 +105,13 @@ button,
 #imgHome {
     position:absolute;
     top: -150px;
-    left: 10%;
+    left: 9%;
 }
 
 #imgMonCv {
     position:absolute;
     top: -180px;
-    right: 8%;
+    right: 7%;
 }
 
 #imgMonCv.yoyo {
@@ -147,7 +147,7 @@ button,
     padding: 30px 40px;
     color: black;
     height: 400px;
-    min-width: 300px;
+    min-width: 400px;
 }
 
 .pitch {
@@ -211,6 +211,7 @@ header {
     border: 4px solid tan;
     border-radius: 20px;
     width: 60%;
+    min-width: 900px;
 }
 
 #rdj {
