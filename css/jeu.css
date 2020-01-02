@@ -34,7 +34,11 @@ body {
 header {
     text-decoration: none;
     color: ivory;
-    text-align: center;
+    width: 900px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 footer {

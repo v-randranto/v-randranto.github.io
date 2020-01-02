@@ -1635,16 +1635,13 @@ $(function () {
 
         $('#accueil').css('display', 'none');
         $('#jeu').css('display', 'block');
-        $('#imgHome').css('display', 'block');
-        $('#imgMonCv').css('display', 'block');
 
         var $jouer = $('#jouer');
         var $jouerPos = $jouer.offset();
         $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.innerWidth());
 
         $('#imgHome').animate({ top: "-15px" }, 1700);
-        $('#imgMonCv').delay(500).animate({ top: "0px" }, 1700);
-
+        $('#imgMonCv').delay(500).animate({ top: "0px" }, 1700);       
 
     });
 
