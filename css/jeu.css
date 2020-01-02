@@ -110,11 +110,11 @@ button,
     right: 8%;
 }
 
-#imgMonCv.pendule {
-    animation: penduler 1S ease-in-out 4;
+#imgMonCv.yoyo {
+    animation: yoyo 1S ease-in-out infinite;
 }
 
-@keyframes penduler {
+@keyframes yoyo {
     from {
         top: 0;
     }

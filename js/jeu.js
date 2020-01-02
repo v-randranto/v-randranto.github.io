@@ -450,10 +450,11 @@ $(function () {
             $('#resultat').html(resultat);
             if (this.gagne) {
                 son.gagne.play();
+                $('#imgMonCv').addClass('yoyo');
             } else { 
                 son.perdu.play(); 
             }            
-            $('#imgMonCv').toggleClass('pendule');
+            
         },
 
         // Méthode appelée pour mettre fin immédiatement à la partie quand Arthur un coup de cornes 
@@ -1669,7 +1670,7 @@ $(function () {
 
     $('#btnBaston2').click(function () {
 
-        $('#imgMonCv').toggleClass('pendule');
+        $('#imgMonCv').removeClass('yoyo');
 
         son.jouer.play();
 
