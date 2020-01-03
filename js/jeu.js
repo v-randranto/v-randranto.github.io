@@ -511,10 +511,10 @@ $(function () {
             afficherPageRejeu();
             $('#resultat').html(resultat);
             if (this.gagne) {
-                son.gagne.play();
+                this.son.gagne.play();
                 $('#imgMonCv').addClass('yoyo');
             } else {
-                son.perdu.play();
+                this.son.perdu.play();
             }
 
         },
