@@ -1,4 +1,4 @@
-"use strict"
+'use strict'
 
 //**********************************************************************************************/
 //*                                                                                            */
@@ -86,7 +86,7 @@ $(function () {
         // l'attente est déclenchée quand aucune touche n'est appuyée, elle est déroulée avec un setInterval et s'arrête dès qu'une touche est appuyée
         this.attend = {
             sprites: [
-                // les sprites sont répétés pour ne pas mettre une vitesse trop lente. Quant la vitesse est lente, Arthur parait figé le temps que l'attente se mette en place.
+                // les sprites sont répétés pour ne pas mettre une vitesse trop lente. Quand la vitesse est lente, Arthur parait figé le temps que l'attente se mette en place.
                 { top: 2, left: -2, width: 83, height: 125 },
                 { top: 2, left: -2, width: 83, height: 125 },
                 { top: 2, left: -2, width: 83, height: 125 },
@@ -403,8 +403,8 @@ $(function () {
 
         // Méthode pour afficher le nombre de blasons gagnés et les gamelles prises par Arthur
         afficheScore: function () {
-            $('#nbBlasons').html(this.nbBlasonsRetrouves + " / " + this.nbBlasons);
-            $('#nbGamelles').html(this.nbGamelles + " / " + this.nbGamellesMax);
+            $('#nbBlasons').html(this.nbBlasonsRetrouves + ' / ' + this.nbBlasons);
+            $('#nbGamelles').html(this.nbGamelles + ' / ' + this.nbGamellesMax);
 
             // la partie est terminée, on propose de rejouer
             if (this.gagne || this.perdu) {
@@ -445,7 +445,7 @@ $(function () {
 
         // Méthode appelée pour afficher la page proposant de rejouer
         proposeRejeu: function () {
-            var resultat = this.gagne ? "Gagné !" : "Perdu !";
+            var resultat = this.gagne ? 'Ouééé !' : 'Aaargh !';
             afficherPageRejeu();
             $('#resultat').html(resultat);
             if (this.gagne) {
@@ -843,11 +843,11 @@ $(function () {
 
             this.nomAction = nomAction;
             this.persoAction = personnage[nomAction];
-            this.$masque = $(idImage + "Masque");
+            this.$masque = $(idImage + 'Masque');
             this.$image = $(idImage);
             this.determinerSens(personnage);
             this.accederImageSprite(indice);
-            if (nomAction === "saute") {
+            if (nomAction === 'saute') {
                 this.deplacerMasqueSaut(indice);
             } else {
                 this.deplacerMasque(indice);
@@ -898,7 +898,7 @@ $(function () {
         }
 
         //Le personnage d'Arthur effectue un pas de déplacement
-        unMouvementSprite.action(arthur, "#arthur", nomAction, indiceArthur[nomAction]);
+        unMouvementSprite.action(arthur, '#arthur', nomAction, indiceArthur[nomAction]);
         indiceArthur[nomAction]++;
     };
 
@@ -929,7 +929,7 @@ $(function () {
             return;
         }
 
-        arthurAction("attaque");
+        arthurAction('attaque');
 
         // test de la collision avec les murs
         if (collision.checkMurs(arthur.direction, $arthurMasque, 20)) {
@@ -980,7 +980,7 @@ $(function () {
             return;
         }
 
-        arthurAction("attend");
+        arthurAction('attend');
     };
 
     var decompteContent = null;
@@ -1004,7 +1004,7 @@ $(function () {
 
             return;
         }
-        arthurAction("content");
+        arthurAction('content');
         decompteContent--;
     };
 
@@ -1022,7 +1022,7 @@ $(function () {
             return;
         }
 
-        arthurAction("ko");
+        arthurAction('ko');
     };
 
     // calcul des coordonnées des positions successives d'Arthur pendant le saut
@@ -1056,7 +1056,7 @@ $(function () {
             return;
         }
 
-        arthurAction("saute");
+        arthurAction('saute');
 
         if (arthur.direction.droite) {
             if (arthur.saute.angle0 >= arthur.saute.angleFinAscension) {
@@ -1107,7 +1107,7 @@ $(function () {
 
             return;
         }
-        arthurAction("vacille");
+        arthurAction('vacille');
         decompteVacille--;
     };
 
@@ -1138,7 +1138,7 @@ $(function () {
 
             arthur.initStatuts();
             arthur.court.statut = true;
-            arthurAction("court");
+            arthurAction('court');
 
             // test de la collision avec les murs
             if (collision.checkMurs(arthur.direction, $arthurMasque, 20)) {
@@ -1233,7 +1233,7 @@ $(function () {
         }
 
         //Le personnage de georges effectue un pas de déplacement
-        unMouvementSprite.action(georges, "#georges", nomAction, indiceGeorges[nomAction]);
+        unMouvementSprite.action(georges, '#georges', nomAction, indiceGeorges[nomAction]);
         indiceGeorges[nomAction]++;
     }
 
@@ -1247,7 +1247,7 @@ $(function () {
             indiceGeorges.applati = 0;
             return;
         }
-        georgesAction("applati");
+        georgesAction('applati');
     };
 
     var georgesAttend = function () {
@@ -1255,7 +1255,7 @@ $(function () {
         georges.initStatuts();
         georges.attend.statut = true;
         intervalIdGeorgesAction = setInterval(function () {
-            georgesAction("attend")
+            georgesAction('attend')
         }, georges.attend.vitesse);
     };
 
@@ -1264,7 +1264,7 @@ $(function () {
         georges.initStatuts();
         georges.vacille.statut = true;
         intervalIdGeorgesAction = setInterval(function () {
-            georgesAction("vacille")
+            georgesAction('vacille')
         }, georges.vacille.vitesse);
     };
 
@@ -1308,7 +1308,7 @@ $(function () {
                 if (decisionAttaque.aleatoire()) {
                     georges.initStatuts();
                     georges.attaque.statut = true;
-                    georgesAction("attaque");
+                    georgesAction('attaque');
                     return;
                 }
             }
@@ -1320,19 +1320,19 @@ $(function () {
                 if (Date.now() - decisionAttaque.dateAttaqueOk < 2000) {
                     georges.initStatuts();
                     georges.attaque.statut = true;
-                    georgesAction("attaque");
+                    georgesAction('attaque');
                     return;
                 }
 
                 // décision prise plus de 2 secondes avant, Georges reprend sa course
                 georges.initStatuts();
                 georges.court.statut = true;
-                georgesAction("court");
+                georgesAction('court');
 
                 decisionAttaque = null;
 
                 // Test Collision avec les murs 
-                if (collision.checkMurs(georges.direction, $georgesMasque, 5)) {
+                if (collision.checkMurs(georges.direction, $georgesMasque, 10)) {
                     //Georges fait demi-tour
                     georges.direction.droite = !georges.direction.droite;
                     georges.direction.gauche = !georges.direction.gauche;
@@ -1347,7 +1347,7 @@ $(function () {
                 if (Date.now() - decisionAttaque.dateAttaqueKo < 2000) {
                     georges.initStatuts();
                     georges.court.statut = true;
-                    georgesAction("court");
+                    georgesAction('court');
                     // Test Collision avec les murs  
                     if (collision.checkMurs(georges.direction, $georgesMasque, 5)) {
                         //Georges fait demi-tour
@@ -1365,7 +1365,7 @@ $(function () {
         {
             georges.initStatuts();
             georges.court.statut = true;
-            georgesAction("court");
+            georgesAction('court');
             // Test collision avec les murs 
             if (collision.checkMurs(georges.direction, $georgesMasque, 5)) {
                 //Georges fait demi-tour
@@ -1463,7 +1463,7 @@ $(function () {
     var $blasonsMasque = $('#blasonsMasque');
 
     var son = {
-        jouer: document.getElementById("sonJouer"),
+        jouer: document.getElementById('sonJouer'),
         blason: document.getElementById('sonBlason'),
         gamelle: document.getElementById('sonGamelle'),
         gagne: document.getElementById('sonGagne'),
@@ -1490,12 +1490,12 @@ $(function () {
     var miseEnMouvementPersonnages = function () {
 
         // Arthur
-        arthur.actionPrecedente = "attend";
+        arthur.actionPrecedente = 'attend';
         initArthurAttend();
         intervalIdArthurAction = setInterval(arthurAttend, arthur.attend.vitesse);
 
         // Georges
-        georges.actionPrecedente = "attend";
+        georges.actionPrecedente = 'attend';
         georgesAttend();
     }
 
@@ -1645,7 +1645,7 @@ $(function () {
 
     // Fonction d'affichage de la page de rejeu
     var afficherPageRejeu = function () {
-        $('#rejouer').css('display', 'block').height($('#scene').height()).width($('#scene').width());
+        $('#rejouer').css('display', 'flex').height($('#scene').height()).width($('#scene').width());
     }
     
     //  Ajustement des affichages à la hauteur de la fenêtre de l'écran  
@@ -1673,8 +1673,8 @@ $(function () {
         $('#rejouer').css({ top: $jouerPos.top, left: $jouerPos.left }).width($jouer.innerWidth());
 
         // Apparition des liens vers l'accueil et vers le CV
-        $('#imgHome').animate({ top: "-15px" }, 1700);
-        $('#imgMonCv').delay(500).animate({ top: "0px" }, 1700);       
+        $('#imgAccueil').animate({ top: '-15px' }, 1700);
+        $('#imgMonCv').delay(500).animate({ top: '0px' }, 1700);       
 
     });
 
