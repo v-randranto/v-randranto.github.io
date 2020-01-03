@@ -9,10 +9,12 @@
 
 <!-- 
     La page html "index" comporte 2 parties :
+
     1- la page d'accueil présentant le jeu CV et proposant de jouer ou d'aller directement vers le CV
+
     2- la page de jeu comporte 3 sous-parties :
         2a- expliquant les règles du jeu et permettant de démarrer le jeu
-        2b- affichant l'espace dans lequel se déroule le jeu et qui intègre l'affichage du score; les blasons sont affichés au-dessus de cet espace
+        2b- affichant l'espace dans lequel se déroule le jeu et qui intègre l'affichage du score; les blasons retrouvés sont affichés au-dessus de cet espace
         2c- proposant de rejouer après la fin du jeu
  -->
 
@@ -87,10 +89,10 @@
     <div id="jeu">
 
         <!-- lien de retour vers l'accueil -->
-        <a id="imgAccueil" class="bulle" texte="Retour à l'accueil" href="index.html"><img src="images/araignee_accueil_b.png" alt="Bouton accueil" width="125"></a>
+        <a id="imgAccueil" class="bulle" texte="Retour à l'accueil" href="index.html"><img src="images/araignee_accueil_b.png" alt="Lien vers accueil" width="125"></a>
 
         <!-- lien vers la page CV -->
-        <a id="imgMonCv" class="bulle" texte="Il est là le cv !" href="moncv.html"><img src="images/araignee_cv_b.png" alt="Bouton CV" width="100"></a>
+        <a id="imgMonCv" class="bulle" texte="Il est là le cv !" href="moncv.html"><img src="images/araignee_cv_b.png" alt="Lien vers CV" width="100"></a>
 
         <div id="blasonsConteneur">
             <div id="blasonsMasque">
@@ -141,7 +143,7 @@
             </article>
 
             <!-- 
-               2a- Affichage des personnages, du score et des blasons retrouvés
+               2a- Affichage des personnages, du score et des blasons retrouvés quand on clique sur "baston".
             -->
             <div id='jouer'>
                 <div id="score">
@@ -159,10 +161,11 @@
             </div>
 
             <!-- 
-               2c- Affichage de la page de rejeu quand la partie est terminée, en opacité par dessus l'espace de jeu. Elle disparaît quand on clique sur le bouton "baston again" pour une nouvelle partie.
+               2c- Affichage de la page de rejeu quand la partie est terminée, en opacité par dessus l'espace de jeu. Il disparaît quand on clique sur le bouton "baston again" pour une nouvelle partie.
             -->
             <div id="rejouer">
                 <div>
+                    <!-- dans "resultat" on affiche l'issue du jeu: perdu ou gagné -->
                     <p id="resultat"></p>
                     <button id="btnBaston2" class="baston">baston again</button>
                 </div>

@@ -1,7 +1,6 @@
 'use strict'
 
 //**********************************************************************************************/
-//*                                                                                            */
 //*                     PRINCIPES DU JEU                                                       */
 //*============================================================================================*/ 
 //*  Pour gagner à ce jeu, Arthur doit récupérer les 12 blasons volés par Georges.             */
@@ -24,42 +23,78 @@
 //*  -------------------------------------                                                     */ 
 //*  1) Arthur attaque ou percute Georges alors que celui-ci est en position d'attaque         */
 //*  2) Arthur saute et retombe sur les cornes relevées de Geooges                             */
-//*  Dans ces 2 cas la partie est perdu pour Arthur                                            */
-//*                                                                                            */
+//*  Dans ces 2 cas la partie est perdu pour Arthur.                                           */
 //**********************************************************************************************/
-
 
 $(function () {
 
     window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
         window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
-    //**********************************************************************************************/
-    //*                     LA GESTION DES PERSONNAGES ARTHUR ET GEORGES                           */
-    //*============================================================================================*/
-    //*                                                                                            */
-    //*  Chaque personnage est représenté par un objet qui contient les propriétés propriétés      */
-    //*  permettant de gérer leur déplacement selon l'action engagée :                             */
-    /*                                                                                            */
-    //*  - l'orientation des sprites du personnage, ceux d'Arthur le sont vers la droite, ceux de  */          //*    Georges vars la gauche                                                                  */
-    //*  - la direction du déplacement en cours                                                    */
-    //*  - pour chaque action que peut engager le personnage :                                     */ 
-    //*    . une table des positions et tailles des sprites appropriés                             */
-    //*    . le statut de l'action                                                                 */
-    //*    . le nombre de pixels pour un pas de déplacement, dans le cas du saut d'Arthur ce sont  */          //*      des radians car c'est un demi-cercle                                                  */
-    //*    . un booléen qui indique si on reboucle sur le 1er sprite quand on arrive au dernier    */
-    //*      sprite de la table                                                                    */
-    //*    . une vitesse si l'action est déroulée avec une fonction setInterval().                 */ 
-    //*                                                                                            */
-    //*  Il y a aussi des méthodes d'initialisation                                                */ 
-    //*                                                                                            */
-    //**********************************************************************************************/
+    //*************************************************************************************************/
+    //*                     LA GESTION DES PERSONNAGES ARTHUR ET GEORGES                              */
+    //*===============================================================================================*/
+    //*  La technique des sprites est utilisée ici pour déplacer les personnages.                     */
+    //*  Ainsi, une feuille de sprites et un masque d'affichage sont associés à chaque personnage.    */
+    //*  Pour exploiter les sprites, chaque personnage est représenté par un objet qui contient les   */
+    //*  propriétés permettant de gérer leur déplacement selon l'action engagée :                     */
+    //*                                                                                               */
+    //*  - l'orientation des sprites du personnage, ceux d'Arthur le sont vers la droite, ceux de     */       //*    Georges vers la gauche                                                                     */
+    //*  - la direction du déplacement en cours                                                       */
+    //*  - pour chaque action que peut engager le personnage, il y a:                                 */ 
+    //*    . une table des positions et tailles des sprites concernés                                 */
+    //*    . le statut de l'action                                                                    */
+    //*    . le nombre de pixels pour un pas de déplacement, dans le cas du saut en demi-cercle       */       //*      ce sont des radians                                                                      */
+    //*    . un booléen qui indique si on reboucle sur le 1er sprite quand on arrive au dernier       */
+    //*      sprite de la table                                                                       */
+    //*    . une vitesse si l'action est déroulée avec une fonction répétée (avec setInterval).       */ 
+    //*                                                                                               */
+    //*  Il y a aussi des méthodes d'initialisation des propriétés.                                   */
+    //*                                                                                               */
+    //*  Pour dérouler une action, on accède à sa table de sprites et on la parcourt pour exécuter    */
+    //*  un pas par sprite :                                                                          */
+    //*  - ajustement du masque d'Arthur avec les dimensions du sprite accédé                         */       //*  - positionnement du sprite dans le masque                                                    */       //*  - déplacement du masque selon le pas indiqué (le pas peut être nul)                          */  
+    //*************************************************************************************************/
 
-    //*====================================================================*/
-    //*      Arthur                                                        */
-    //*--------------------------------------------------------------------*/
-    //* 3 types d'actions TODO
-    //*====================================================================*/
+    //*============================================================================================*/
+    //*                 GESTION D'ARTHUR                                                           */
+    //*--------------------------------------------------------------------------------------------*/
+    //*  Les propriétés du personnage d'Arthur doivent permettre de gérer ses actions: Arthur      */
+    //*  attaque, attend, est content, court, est ko, saute et vacille.                            */
+    //*                                                                                            */
+    //*  Une action est déclenchée par l'appui d'une touche ou par une situation de collision :    */
+    //*  on accède à la table des sprites de l'action qui sera parcourue pour exécuter le          */
+    //*  déplacement.                                                                              */
+    //*                                                                                            */
+    //*  1) L'appui d'une touche permet de faire un pas :                                          */
+    //*  - à chaque appui on accède au sprite suivant. Quand le dernier est atteint, on retourne   */
+    //*    au 1er. Ex. de l'action "court" avec les flêches directionnelles droite/gauche          */
+    //*                                                                                            */  
+    //*  2) L'appui d'une touche déclenche le déroulement complet d'une action : nécessite donc la */          //*  répétition de l'éxécution d'un pas (setInterval).                                         */
+    //*  La répétition prend fin quand :                                                           */
+    //*    . le dernier sprite est atteint, ex. action "saut" avec la flêche vers le haut          */
+    //*    . tous les sprites ont été parcourus un nombre déterminé de fois (rebouclage),           */
+    //*      ex. action "attaque" avec la barre espace                                             */ 
+    //*  Une propriété de l'action, nombre de boucles, permet de gérer le rebouclage.              */
+    //*  Une propriété de l'action, vitesse, indique le délai à appliquer entre chaque répétion.   */ 
+    //*                                                                                            */
+    //*  3) Une collision déclenche le déroulement complet d'une action, de la même façon que      */
+    //*  décrit ci-dessus. Ex. des actions "content" quand Arthur attaque Georges avec succès,     */ 
+    //*  "ko" quand il est encorné, "vacille" quand il percute un mur ou Georges.                  */
+    //*                                                                                            */
+    //*  4) Cas particulier : l'action "attend" est déclenchée quand aucune touche n'est appuyée.  */
+    //*  Une fonction répétée prend en charge l'action et la répétition se termine quand une       */
+    //*  touche d'action est appuyée.                                                              */
+    //*                                                                                            */
+    //*  Les actions concernées ont leur fonction répétée spécifique.                              */
+    //*                                                                                            */
+    //*  Toutes ces opérations sont pilotées par la fonction "pitoteDeplacementsArthur" qui :      */
+    //*  - détermine l'action à engager selon les touches appuyées                                 */
+    //*  - appelle l'exécution d'un pas                                                            */
+    //*  - appelle le déroulement complet d'une action                                             */
+    //*  - appelle la détection des collisions                                                     */
+    //*  Cette fonction est appelée en mode répétition (setInterval) au démarrage du jeu.          */ 
+    //*============================================================================================*/
 
     var ArthurPersonnage = function () {
         this.actionPrecedente = null;
@@ -71,7 +106,7 @@ $(function () {
         // sprites orientés vers la droite
         this.orientation = 1;
 
-        // Le mouvement d'attaque est déclenché par une touche et est déroulé par un setInterval. Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action
+        // L'action "attaque" est déclenchée par la touche entrée et est déroulée par un setInterval. Arrivé au dernier sprite on reboucle.
         this.attaque = {
             sprites: [
                 { top: 30, left: -792, width: 118, height: 124 },
@@ -83,7 +118,7 @@ $(function () {
             vitesse: 5
         };
 
-        // l'attente est déclenchée quand aucune touche n'est appuyée, elle est déroulée avec un setInterval et s'arrête dès qu'une touche est appuyée
+        // L'action "attente" est déclenchée quand aucune touche n'est appuyée, elle est déroulée avec un setInterval et s'arrête dès qu'une touche est appuyée
         this.attend = {
             sprites: [
                 // les sprites sont répétés pour ne pas mettre une vitesse trop lente. Quand la vitesse est lente, Arthur parait figé le temps que l'attente se mette en place.
@@ -100,7 +135,7 @@ $(function () {
             vitesse: 100
         };
 
-        // Le mouvement d'attaque est déclenché par une touche et est déroulé par un setInterval. Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action
+        // L'action "content" est déclenchée suite à une attaque réussie et est déroulée par un setInterval. Arrivé au dernier sprite on reboucle.
         this.content = {
             sprites: [
                 { top: 2, left: -2, width: 83, height: 125 },
@@ -113,7 +148,7 @@ $(function () {
             vitesse: 80
         };
 
-        // Le mouvement de course est déclenché par une touche, à chaque appui Arthur se déplacement d'un pas. Quand on arrive au dernier sprite on reboucle.
+        // L'action "court" est déclenché" par les touches flêches droite/gauche, à chaque appui Arthur se déplacement d'un pas. Quand on arrive au dernier sprite on reboucle.
         this.court = {
             sprites: [
                 { top: 0, left: -173, width: 86, height: 125 },
@@ -146,7 +181,7 @@ $(function () {
             boucle: false,
             vitesse: 100
         };
-        // Le mouvement de saut est déclenché par une touche, déroulé avec un setInterval qui prend fin au dernier sprite. C'est un déplacement en demi-cercle selon le centre, le rayon et l'angle de départ, tous des propritétés du saut. Pour la gestion de la collision avec Georges, on distingue la phase ascendante et la descendante également propriétés du saut. Enfin, le pas est en radians. 
+        // Le mouvement de saut est déclenché par une touche, déroulé avec un setInterval qui prend fin au dernier sprite. C'est un déplacement en demi-cercle selon un centre (x,y), le rayon et l'angle de départ, tous des propriétés du saut. Pour la gestion de la collision avec Georges, on distingue la phase ascendante et la descendante également propriétés du saut. Enfin, le pas est en radians. 
 
         this.saute = {
             // il n'y a que 2 sprites pour le saut (ascension, descente). Ils sont répétés pour avoir un sprite pour chaque pas de PI/30
@@ -190,14 +225,14 @@ $(function () {
             pas: Math.PI / 30,
             x0: 0,
             y0: 0,
-            angle0: Math.PI, // il est initialisé à 2PI quand Arthur va à gauche
+            angle0: Math.PI, // angle de départ, il est initialisé à 2PI quand Arthur va à gauche
             rayon: 142,
-            ascension: false,
-            descente: false,
-            angleFinAscension: Math.PI + Math.PI / 2
+            ascension: false, // initialisé à true au départ du saut, passe à false à la fin de cette phase
+            descente: false, // initialisé à false au départ du saut, passe à true à la fin de l'ascension
+            angleFinAscension: Math.PI + Math.PI / 2 //détermine la fin de la phase d'ascension
         };
 
-        // Le vacillement est déclenché quand Arthur percute Georges et déroulé avec un setInterval(). Arrivé au dernier sprite on reboucle autant de fois qu'indiqué par la propriété nbBoucles de l'action.
+        // L'action "vacille" est déclenchée quand Arthur percute un mur ou Georges et déroulée avec un setInterval(). Arrivé au dernier sprite on reboucle.
         this.vacille = {
             sprites: [
                 { top: 0, left: -911, width: 96, height: 143 },
@@ -210,12 +245,13 @@ $(function () {
             vitesse: 100
         };
 
-        // méthodes d'initialisation des propriétés
+        // méthode d'initialisation des directions droite/gauche
         this.initDirection = function (droite, gauche) {
             this.direction.droite = droite;
             this.direction.gauche = gauche;
         };
 
+        // méthode d'initialisation du statut des actions
         this.initStatuts = function () {
             this.attaque.statut = false;
             this.attend.statut = false;
@@ -228,11 +264,34 @@ $(function () {
 
     };
 
-    //*============================================================================*/
-    //*      Georges                                                               */
-    //*----------------------------------------------------------------------------*/
-    //*  Les actions de Georges sont déroulées avec des setInterval() avec 
-    //*============================================================================*/
+    //*============================================================================================*/
+    //*                GESTION DE GEORGES                                                          */
+    //*--------------------------------------------------------------------------------------------*/
+    //*  Les propriétés du personnage de Georges doivent permettre de gérer ses actions: Georges   */
+    //*  attaque, attend, court, est applati et vacille.                                           */
+    //*                                                                                            */
+    //*  Les actions de Georges sont déclenchées par le démarrage d'une partie de jeu ou par une   */
+    //*  collision.                                                                                */
+    //*  Comme pour Arthur, on accède à la table des sprites de l'action qui sera parcourue pour   */
+    //*  exécuter le déplacement.                                                                  */
+    //*                                                                                            */
+    //*  Une fonction spécifique à Georges, "piloteDeplacementsGeorges" va piloter les différentes */ 
+    //*  opérations de déplacement. Elle est appelée de façon répétitive (setInterval) au          */
+    //*  démarrage du jeu.                                                                         */
+    //*                                                                                            */
+    //*  1) Georges "court" au démarrage du jeu et, selon la position d'Arthur, l'"attaque" quand  */
+    //*  il est à sa portée ou fait demi-tour si Arthur est dans son dos                           */
+    //*                                                                                            */
+    //*  2) Il fait demi-tour en cas de collision avec un mur.                                     */ 
+    //*                                                                                            */
+    //*  3) Une collision avec Arthur interrompt la fonction pilote et déclenche le déroulement    */
+    //*  complet d'une action :                                                                    */
+    //*  - Georges "attend" après avoir encorné Arthur ou qu'Arthur l'ait percuté                  */
+    //*  - il "vacille" si Arthur l'attaque avec succès                                            */
+    //*  - il est "applati" si Arthur lui saute sur le dos.                                        */
+    //*  Comme pour Arthur, le déroulement complet d'une action est l'exécution répétée d'un pas   */          //*  de déplacement.                                                                           */
+    //*  La fonction pilote reprend la main quand le traitement de la collision est terminée.      */
+    //*============================================================================================*/
 
     var GeorgesPersonnage = function () {
 
@@ -370,11 +429,8 @@ $(function () {
     };
 
     //********************************************************************************************/
-    //                                                                                           */
     //*                            GESTION DU SCORE                                              */
-    //*                                                                                          */
     //*==========================================================================================*/
-    //*                                                                                          */
     //*   La variable scoreJeu référence un objet dont les propriétés et méthodes permettent:    */   
     //*   - de tenir le score des blasons retrouvés et des gamelles prises                       */
     //*   - d'afficher le score à chaque modification                                            */
@@ -383,7 +439,6 @@ $(function () {
     //*                                                                                          */
     //*   L'image des blasons sont dans une feuille de sprites de mêmes dimensions.              */
     //*   Un objet blason, propriété de scoreJeu, contient les dimensions d'un sprite            */ 
-    //*                                                                                          */
     //********************************************************************************************/
 
     var scoreJeu = {
@@ -395,6 +450,13 @@ $(function () {
         nbGamelles: 0,
         gagne: false,
         perdu: false,
+        son : {
+            jouer: document.getElementById('sonJouer'),
+            blason: document.getElementById('sonBlason'),
+            gamelle: document.getElementById('sonGamelle'),
+            gagne: document.getElementById('sonGagne'),
+            perdu: document.getElementById('sonPerdu')
+        },
 
         // Méthode pour afficher les blasons gagnés suite à une attaque d'Arthur
         afficheBlason: function () {
@@ -421,7 +483,7 @@ $(function () {
                 this.nbBlasonsRetrouves = this.nbBlasons;
                 this.gagne = true;
             }
-            son.blason.play();
+            this.son.blason.play();
             this.afficheBlason();
             this.afficheScore();
         },
@@ -432,7 +494,7 @@ $(function () {
             if (this.nbGamelles == this.nbGamellesMax) {
                 this.perdu = true;
             }
-            son.gamelle.play();
+            this.son.gamelle.play();
             this.afficheScore();
         },
 
@@ -451,15 +513,15 @@ $(function () {
             if (this.gagne) {
                 son.gagne.play();
                 $('#imgMonCv').addClass('yoyo');
-            } else { 
-                son.perdu.play(); 
-            }            
-            
+            } else {
+                son.perdu.play();
+            }
+
         },
 
         // Méthode appelée pour mettre fin immédiatement à la partie quand Arthur un coup de cornes 
         rejeuDirect: function () {
-            son.gamelle.play();
+            this.son.gamelle.play();
             this.perdu = true;
             this.afficheScore();
         },
@@ -478,7 +540,7 @@ $(function () {
             if (collision.avecGeorges) {
                 //on repositionne les personnages
                 initPositionPersonnages();
-                intervalIdDeplacementGeorges = setInterval(deplacementGeorges, georges.vitesse);
+                intervalIdDeplacementsGeorges = setInterval(piloteDeplacementsGeorges, georges.vitesse);
             }
 
             // réactivation du clavier, cela permet de mettre Arthur automatiquement en attente.
@@ -488,14 +550,46 @@ $(function () {
         }
 
     };
-    // TODO completer commentaires
-    //*********************************************************************/
-    //*                  GESTION DES COLLISIONS                           */
-    //*-------------------------------------------------------------------*/
-    //*  Fonctions de test des collisions                                 */
-    //*  - Arthur / Georges avec les murs gauche et droit                 */
-    //*  - Arthur avec George selon leur direction                        */
-    //*********************************************************************/ 
+    //********************************************************************************************/
+    //*                            GESTION DES COLLISIONS                                        */
+    //*==========================================================================================*/
+    //*  Les collisions suivantes sont détectées et gérées :                                     */
+    //*                                                                                          */
+    //*  - contre les murs:                                                                      */
+    //*    . Arthur pendant sa course ou un saut : il prend une gamelle et "vacille"             */
+    //*    . Georges pendant sa cours : il fait demi-tour et continue sa course                  */
+    //*                                                                                          */            //*  - entre Arthur et Georges:                                                              */            //*    . Si Georges encorne Arthur (quoi qu'il fasse), celui est "ko", Georges "attend" et   */ 
+    //*      est perdue pour Arthur                                                              */            //*    . Si Arthur saute sur le dos de Georges, il est "content" car il gagne 3 blasons et   */
+    //*      Georges est "applati"                                                               */
+    //*    . Si Arthur attaque et atteint Georges de face, il est "content" car il gagne 2       */
+    //*      blasons et Georges "vacille".                                                       */
+    //*    . Si Arthur attaque et atteint Georges par derrière, il est "content" car il gagne 1  */
+    //*      blason et Georges "vacille".                                                        */
+    //*    . Si Arthur percute Georges par derrière, il est "vacille" et Georges "attend".       */
+    //*                                                                                          */
+    //*  Quand il y a collision entre Arthur et Georges, les touches sont désactivées et la      */
+    //*  fonction qui pilote Georges est interrompue, le tout jusqu'à la fin du traitement de    */
+    //*  la collision.                                                                           */
+    //*                                                                                          */
+    //*  1) La détection d'une collision est gérée à travers une 'instance' de l'objet Collision.*/
+    //*  Elle a des propriétés :                                                                 */
+    //*  - flags booléens qui situent Arthur par rapport à Georges                               */
+    //*  - qui enregistrent les positions et dimensions de chacun au moment de la collision      */
+    //*  - flags booléens du type de collision: avec le mur, Arthur avec Georges...              */
+    //*  Elle a des méthodes qui détectent spécifiquement la collision:                          */
+    //*  - avec les murs                                                                         */            //*  - entre Arthur et Georges                                                               */
+    //*  - et si Arthur saute, la collision avec le dos ou les cornes de Georges                 */
+    //*                                                                                          */
+    //*  2) Une 'instance' de l'objet ActionsCollision permet:                                     */          
+    //*  - de gérer les réactions des personnages suite à une collision: "content", "vacille",   */
+    //*    "applati", "ko", "attend"                                                             */
+    //*  - d'évaluer et d'enregistrer le score en faisant appel aux méthodes de "scoreJeu" qui   */
+    //*    incrémentent le nombre de gamelles ou de blasons retrouvés.                           */       
+    //********************************************************************************************/    
+
+    //*==========================================/
+    //*       DETECTION DES COLLISIONS           / 
+    //*==========================================/
 
     var Collision = function () {
 
@@ -510,6 +604,7 @@ $(function () {
         this.georgesData = { x: 0, y: 0, w: 0, h: 0 };
         this.murData = { x: 0, w: 0 };
 
+        // méthode appelée par les fonctions pilote des déplacements avant d'appeler les méthodes qui détectent les collisions. Elle initialise toutes les propriétés.
         this.initialisation = function () {
 
             // Arthur se trouve à gauche de Georges
@@ -534,13 +629,13 @@ $(function () {
             this.sautSurCornesGeorges = false;
             this.sautSurDosGeorges = false;
 
-            // Données d'Arthur 
+            // Données position et dimensions d'Arthur 
             this.arthurData.x = $arthurMasque.offset().left;
             this.arthurData.y = $arthurMasque.offset().top;
             this.arthurData.w = $arthurMasque.width();
             this.arthurData.h = $arthurMasque.height();
 
-            // Données de Georges 
+            // Données position et dimensions de Georges 
             this.georgesData.x = $georgesMasque.offset().left;
             this.georgesData.y = $georgesMasque.offset().top;
             this.georgesData.w = $georgesMasque.width();
@@ -552,7 +647,7 @@ $(function () {
 
         };
 
-        // contrôle de la collision avec les murs
+        // méthode appelée par les fonctions pilote des déplacements pour détecter les collisions avec les murs
         this.checkMurs = function (direction, $masque, marge) {
             this.initialisation();
             var $masqueData = {
@@ -566,10 +661,8 @@ $(function () {
             } else return false;
         };
 
-
         // Collision d'Arthur avec les cornes de Georges pendant son saut
         this.checkSautSurCornes = function () {
-
 
             // Allez, on s'accorde pour dire que les cornes sont 1/3 de la largeur de Georges
             var georgesDataX = this.georgesData.x,
@@ -591,8 +684,7 @@ $(function () {
 
         };
 
-        // Collision d'Arthur avec le derrière de Georges pendant son saut
-
+        // Collision d'Arthur avec le dos de Georges pendant son saut
         this.checkSautSurDos = function () {
 
             // le dos est sur 2/3 de la largeur de Georges
@@ -614,6 +706,7 @@ $(function () {
 
         };
 
+        // méthode appelée par la fonction pilote des déplacements d'Arthur pour détecter les collisions avec Georges
         this.checkCollisionGeorges = function () {
 
             this.initialisation();
@@ -633,12 +726,11 @@ $(function () {
 
         }
 
-
     };
 
-    //============================================================/
-    //  GESTION DES ACTIONS SUITE A UNE COLLISION                 / 
-    //============================================================/
+    //*============================================================/
+    //*       GESTION DES REACTIONS SUITE A UNE COLLISION          / 
+    //*============================================================/
 
     var ActionsCollision = function () {
 
@@ -659,16 +751,18 @@ $(function () {
             //   collision d'Arthur avec Georges   /
             //-------------------------------------/
 
-            // On cesse le parcours automatique de Georges
-            clearInterval(intervalIdDeplacementGeorges);
+            // On interrompt le pilotage des déplacements de Georges
+            clearInterval(intervalIdDeplacementsGeorges);
 
-            // Arthur saute
+            // Arthur est en train de sauter
             if (arthur.saute.statut) {
                 if (arthur.saute.ascension) {
                     if ((arthur.direction.droite !== georges.direction.droite) && georges.attaque.statut) {
                         initArthurKo();
                         intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
+                        georgesAttend();
                         scoreJeu.rejeuDirect();
+
                         return;
                     }
                     initArthurVacille();
@@ -694,10 +788,10 @@ $(function () {
                 // Arthur tombe sur les cornes 
                 initArthurKo();
                 intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
+                georgesAttend();
                 scoreJeu.rejeuDirect();
                 return;
             }
-
 
             // Arthur et Georges se font face, duel à OK Corral...
             if (collision.frontal) {
@@ -706,6 +800,7 @@ $(function () {
                 if (georges.attaque.statut) {
                     initArthurKo();
                     intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
+                    georgesAttend();
                     scoreJeu.rejeuDirect();
                     return;
                 }
@@ -733,6 +828,7 @@ $(function () {
                 if (georges.attaque.statut) {
                     initArthurKo();
                     intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
+                    georgesAttend();
                     scoreJeu.proposeRejeu();
                     return;
                 }
@@ -766,25 +862,36 @@ $(function () {
     }
 
     //*******************************************************************************************************/
-    //*                            GESTION DU DEPLACEMENT DES PERSONNAGES                                   */
+    //*                            GESTION DES ACTIONS/DEPLACEMENT DES PERSONNAGES                          */
     //*=====================================================================================================*/
-    //                                                                                                      */
+    //*  Arthur et Georges ont un fonctionnement similaire. L'exécution d'un pas pour l'un et l'autre est   */
+    //*  identique. C'est géré à travers l'objet "unMouvementSprite". Il suffira d'invoquer la méthode      */
+    //*  "action" en passant le nom de l'action (ex: "court") pour un personnage et son masque.             */ 
+    //*                                                                                                     */
+    //*  Pour les déplacements pas à pas, la méthode est invoquée directement par la fonction pilote des    */
+    //*  déplacements. C'est le cas des actions "court" d'Arthur et "court" et "attaque" de Georges         */
+    //*                                                                                                     */
+    //*  Les actions à dérouler complètement avec ou sans rebouclage nécessitent d'appeler de façon répétée */
+    //*  l'exécution d'un pas. Elles font l'objet d'une fonction spécifique à l'action et au personnage.    */
+    //*  Elles sont appelées par les fonctions pilote (ex. Arthur "attend", "attaque" et "saute") ou par    */
+    //*  les méthodes de l'instance ActionsCollision (ex. Arthur "vacille", "content" et "ko", Georges      */
+    //*  "attend", "vacille" et "applati".                                                                  */
     //*******************************************************************************************************/
 
-
     //*=====================================================================================================*/
-    //*                           Déplacement d'un 'pas'                                                    */
+    //*                           EXECUTION D'UN PAS DE DEPLACEMENT                                         */
     //*-----------------------------------------------------------------------------------------------------*/
-    //  La variable "unMouvementSprite" permet de gérer un 'pas' de déplacement d'Arthur et de Georges.     */
+    //  La variable "unMouvementSprite" permet de gérer un pas de déplacement d'Arthur et de Georges.       */
     //  Elle référence un objet dont les propriétés et méthodes permettent:                                 */
-    //  - de se positionner sur le sprite à afficher selon l'action en cours                                */
-    //  - de déplacer le masque du sprite.                                                                  */
+    //  - de cibler dans la table des sprites celui à afficher selon l'action en cours                      */
+    //  - d'ajuster la taille du masque                                                                     */
+    //  - de déplacer le masque.                                                                            */
     //                                                                                                      */
     //  Sa méthode 'action' est le moteur du déplacement. C'est elle qui est invoquée pour que le           */ 
     //  personnage effectue un 'pas':                                                                       */
-    //  - elle récupère l'objet personnage, son image de sprites (via son id), le nom de l'action en cours  */
-    //  et l'indice du sprite à afficher pour l'action en cours.                                            */
-    //  - elle lance les méthodes qui permettent d'effectuer le 'pas'.                                      */
+    //  - elle récupère l'objet personnage, l'image du sprite, le nom de l'action en cours et l'indice du   */
+    //    sprite dans la table des sprites l'action en cours du personnage.                                 */
+    //  - elle lance les méthodes qui permettent d'effectuer le pas.                                        */
     //*=====================================================================================================*/
 
     var unMouvementSprite = {
@@ -799,7 +906,7 @@ $(function () {
             this.sensDeplacement = personnage.direction.droite ? 1 : -1;
             this.orientation = personnage.orientation;
         },
-         
+
         accederImageSprite: function (indice) {
             this.$image.css({
                 top: this.persoAction.sprites[indice].top,
@@ -856,14 +963,11 @@ $(function () {
 
     };
 
+    //*===================================*/
+    //*      LES ACTIONS D'ARTHUR         */
+    //*===================================*/
 
-    //*=====================================================================================================*/
-    //*                            GESTION DES DEPLACEMENTS D'ARTHUR                                        */
-    //*-----------------------------------------------------------------------------------------------------*/
-    //*                                                                         */
-    //*=====================================================================================================*/
-
-    // indices des actions d'Arthur
+    // indices de la table des sprites de chaque action 
     var indiceArthur = {
         attend: 0,
         content: 0,
@@ -882,6 +986,13 @@ $(function () {
         indiceArthur.ko = 0;
         indiceArthur.saute = 0;
     }
+
+    //-----------------------------------------------------------------------------------------------------/
+    //  Fonction générique appelée pour l'exécution d'un pas pour une action donnée.                       /
+    //  Elle gère l'indice de la table des sprites de l'action et appelle la méthode "action" de l'objet   /
+    //  "unMouvementSprite" en passant le personnage et le masque d'Arthur, le nom de l'action et l'indice /
+    //  du sprite en cours.                                                                                /
+    //-----------------------------------------------------------------------------------------------------/
 
     var arthurAction = function (nomAction) {
         //quand on arrive au dernier sprite de l'action on reboucle sur le 1er 
@@ -902,6 +1013,7 @@ $(function () {
         indiceArthur[nomAction]++;
     };
 
+    // fonction pour désactiver les touches de déplacement d'Arthur, interrompre les actions déroulées par un setInterval et réinitialiser le statut de toutes les actions du personnage d'Arthur. Elle est appelée lorsqu'Arthur attaque et saute et quand une collision est détectée.
     var desactivations = function () {
         clavier.actif = false;
         clavier.reinitTouches();
@@ -909,13 +1021,19 @@ $(function () {
         arthur.initStatuts();
     };
 
-    // Fonctions appelée pour l'éxécution d'un attaque d'Arthur
+    //---------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution d'une attaque  : une fonction d'initialisation et la   /
+    //  fonction d'attaque proprement dite.                                                        /
+    //---------------------------------------------------------------------------------------------/
+
     var decompteAttaque = null;
     var initArthurAttaque = function () {
         desactivations();
         decompteAttaque = arthur.attaque.nbBoucles;
         arthur.attaque.statut = true;
     }
+
+    // Fonction appelée avec un setInterval. Elle appelle la fonction "arthurAction" avec l'argument "attaque" et inclut la détection des collisions avec les murs et Georges.
     var arthurAttaque = function () {
 
         if (decompteAttaque <= 0) {
@@ -950,6 +1068,11 @@ $(function () {
 
     };
 
+    //--------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution de l'attente : une fonction d'initialisation et la    /
+    //  fonction d'attente proprement dite.                                                       /
+    //--------------------------------------------------------------------------------------------/
+
     var initArthurAttend = function () {
         clearInterval(intervalIdArthurAction);
         arthur.initStatuts();
@@ -959,6 +1082,7 @@ $(function () {
     // Variable rustine pour résoudre un bogue : il arrive que 2 actions de mise en attente d'Arthur soient en cours même temps. Je n'ai pas trouvé comment ce cas arrive
     var actionArthurAttend = false;
 
+    // Fonction appelée avec un setInterval. Elle appelle la fonction "arthurAction" avec l'argument "attend" et inclut la détection des collisions avec les murs et Georges.
     var arthurAttend = function () {
 
         // L'appui sur une touche d'action ou la désactivation du clavier met fin à l'attente d'Arthur
@@ -971,7 +1095,6 @@ $(function () {
             return;
         }
 
-
         // test de la collision avec Georges
         if (collision.checkCollisionGeorges()) {
             clearInterval(intervalIdArthurAction);
@@ -983,6 +1106,11 @@ $(function () {
         arthurAction('attend');
     };
 
+    //-----------------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution de l'action "content" après une attaque réussie: une fonction  /
+    //  d'initialisation et la fonction "arthurContent" proprement dite.                                   /
+    //-----------------------------------------------------------------------------------------------------/
+
     var decompteContent = null;
     var initArthurContent = function () {
         desactivations();
@@ -991,6 +1119,7 @@ $(function () {
         $arthurMasque.animate({ bottom: bottomArthurMasque }, 700)
     }
 
+    // Fonction appelée avec un setInterval. Elle appelle la fonction "arthurAction" avec l'argument "content" et inclut le repositionnement des personnages pour la reprise du jeu.
     var arthurContent = function () {
 
         if (decompteContent <= 0) {
@@ -1008,6 +1137,11 @@ $(function () {
         decompteContent--;
     };
 
+    //-----------------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution de l'action "ko" après avoir été encorné : une fonction        / 
+    //  d'initialisation et la fonction KO proprement dite.                                                /
+    //-----------------------------------------------------------------------------------------------------/
+
     var initArthurKo = function () {
         desactivations();
         arthur.ko.statut = true;
@@ -1024,6 +1158,12 @@ $(function () {
 
         arthurAction('ko');
     };
+
+    //--------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution d'un saut : une fonction d'initialisation qui calcule /   
+    //  les éléments permettant la nouvelle position du masque d'Arthur à chaque 'pas'; et la     /
+    //  fonction de saut proprement dite.                                                         /
+    //--------------------------------------------------------------------------------------------/
 
     // calcul des coordonnées des positions successives d'Arthur pendant le saut
     var initArthurSaute = function () {
@@ -1043,7 +1183,7 @@ $(function () {
         }
     }
 
-    // Fonction appelée pour l'éxécution du saut d'Arthur
+    // Fonction appelée avec un setInterval. Elle appelle la fonction "arthurAction" avec l'argument "saute" et inclut la détection des collisions avec les murs et Georges.
     var arthurSaute = function () {
 
         // On est sur le dernier sprite pour le saut
@@ -1070,7 +1210,6 @@ $(function () {
             }
         }
 
-
         // test de la collision avec les murs
         if (collision.checkMurs(arthur.direction, $arthurMasque, 20)) {
             clearInterval(intervalIdArthurAction);
@@ -1088,6 +1227,12 @@ $(function () {
 
     };
 
+    //--------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution d'un vacillement suite à une collision avec un mur    /
+    //  après avoir percuté Georges : une fonction d'initialisation et la fonction de vacillement /
+    //  proprement dite.                                                                          /
+    //--------------------------------------------------------------------------------------------/
+
     var decompteVacille = null;
     var initArthurVacille = function () {
         desactivations();
@@ -1095,6 +1240,7 @@ $(function () {
         arthur.vacille.statut = true;
     };
 
+    // Fonction appelée avec un setInterval. Elle appelle la fonction "arthurAction" avec l'argument "vacille" et inclut le repositionnement des personnages pour la reprise du jeu.
     var arthurVacille = function () {
 
         if (decompteVacille <= 0) {
@@ -1111,447 +1257,8 @@ $(function () {
         decompteVacille--;
     };
 
-    //*=========================================================================*/
-    //*  requestAnimationFrame :                                                */ 
-    //*  - teste les flags des touches action pour déplacer Arthur              */
-    //*  TODO: à compléter                                             */    
-    //*=========================================================================*/
-
-    var gestionTouches = function () {
-
-        if (arthur.ko.statut) {
-            cancelAnimationFrame(rafIdTouches);
-        }
-
-        // Arthur veut aller à gauche, initialisation de sa direction        
-        if (clavier.touches.gauche) {
-            arthur.initDirection(false, true)
-        }
-
-        // Arthur veut aller à gauche, initialisation de sa direction
-        if (clavier.touches.droite) {
-            arthur.initDirection(true, false)
-        }
-
-        // qq soit la direction, test des collisions avec les murs et avec Georges
-        if ((clavier.touches.gauche) || (clavier.touches.droite)) {
-
-            arthur.initStatuts();
-            arthur.court.statut = true;
-            arthurAction('court');
-
-            // test de la collision avec les murs
-            if (collision.checkMurs(arthur.direction, $arthurMasque, 20)) {
-                actionsCollision.gereConsequences();
-            } else {// tests collisison avec georges
-                collision.initialisation();
-                if (collision.checkCollisionGeorges()) {
-                    collision.avecGeorges = true;
-                    actionsCollision.gereConsequences();
-                }
-            }
-
-        }
-
-        // Arthur veut sauter
-        if (clavier.touches.haut) {
-            // Exécution du saut complet (jump + fall)
-            initArthurSaute();
-            arthur.initStatuts();
-            arthur.saute.statut = true;
-            intervalIdArthurAction = setInterval(arthurSaute, arthur.saute.vitesse);
-        }
-
-        // Arthur veut attaquer
-        if (clavier.touches.espace) {
-            // Exécution d'une attaque complète
-            initArthurAttaque();
-            arthur.initStatuts();
-            arthur.attaque.statut = true;
-            intervalIdArthurAction = setInterval(arthurAttaque, arthur.attaque.vitesse);
-        }
-
-        // A flag keyup à true càd aucune touche de déplacement n'est appuyée
-        if (clavier.touches.keyup) {
-
-            // Le clavier est actif, Arthur est mis en attente
-            if (clavier.actif) {
-                clavier.reinitTouches();
-                if (actionArthurAttend) {
-                    // TODO: trouver pourquoi
-                    clearInterval(intervalIdArthurAction);
-                    actionArthurAttend = false;
-                }
-                initArthurAttend();
-                intervalIdArthurAction = setInterval(function () {
-                    actionArthurAttend = true;
-                    arthurAttend();
-                }, arthur.attend.vitesse);
-
-            }
-        }
-
-        rafIdTouches = requestAnimationFrame(gestionTouches);
-
-    };
-
-    //*******************************************************************************************************/
-    //*                            GESTION DEPLACEMENT DE GEORGES                                           */
-    //======================================================================================================*/
-    //*                                                                                                     */
-    //*******************************************************************************************************/
-
-    var indiceGeorges = {
-        attend: 0,
-        court: 0,
-        saute: 0,
-        attaque: 0,
-        vacille: 0,
-        ko: 0
-    };
-    var initIndicesGeorges = function () {
-        indiceGeorges.applati = 0;
-        indiceGeorges.attaque = 0;
-        indiceGeorges.attend = 0;
-        indiceGeorges.court = 0;
-        indiceGeorges.vacille = 0;
-    }
-
-    var georgesAction = function (nomAction) {
-        //quand on arrive au dernier sprite de l'action on reboucle sur le 1er 
-        if (!georges[nomAction].sprites[indiceGeorges[nomAction]]) {
-            indiceGeorges[nomAction] = 0;
-        }
-
-        //Si c'est une nouvelle action on met à jour les propriétés actionPrecedente et le statut correspondant 
-        if (nomAction !== georges.actionPrecedente) {
-            indiceGeorges[georges.actionPrecedente] = 0;
-            georges[georges.actionPrecedente].statut = false;
-            georges.actionPrecedente = nomAction;
-            georges[nomAction].statut = true;
-
-        }
-
-        //Le personnage de georges effectue un pas de déplacement
-        unMouvementSprite.action(georges, '#georges', nomAction, indiceGeorges[nomAction]);
-        indiceGeorges[nomAction]++;
-    }
-
-    var initGeorgesApplati = function () {
-        georges.applati.statut = true;
-    };
-
-    var georgesApplati = function () {
-        if (!georges.applati.sprites[indiceGeorges.applati]) {
-            clearInterval(intervalIdGeorgesAction);
-            indiceGeorges.applati = 0;
-            return;
-        }
-        georgesAction('applati');
-    };
-
-    var georgesAttend = function () {
-        clearInterval(intervalIdGeorgesAction);
-        georges.initStatuts();
-        georges.attend.statut = true;
-        intervalIdGeorgesAction = setInterval(function () {
-            georgesAction('attend')
-        }, georges.attend.vitesse);
-    };
-
-    var georgesVacille = function () {
-        clearInterval(intervalIdGeorgesAction);
-        georges.initStatuts();
-        georges.vacille.statut = true;
-        intervalIdGeorgesAction = setInterval(function () {
-            georgesAction('vacille')
-        }, georges.vacille.vitesse);
-    };
-
-
-    var deplacementGeorges = function () {
-        clearInterval(intervalIdGeorgesAction);
-
-        var georgesAGauche = $georgesMasque.offset().left < $arthurMasque.offset().left;
-
-        var arthurX, georgesX;
-        if (georgesAGauche) {
-            arthurX = $arthurMasque.offset().left;
-            georgesX = $georgesMasque.offset().left + $georgesMasque.width();
-        } else {
-            arthurX = $arthurMasque.offset().left + $arthurMasque.width();
-            georgesX = $georgesMasque.offset().left;
-        }
-
-        // Variable de la condition dans lesquelles Georges doit faire 1/2 tour pour faire face à Arthur
-        var conditionDemiTour = (georges.direction.gauche
-            && georgesAGauche) || (georges.direction.droite
-                && arthur.direction.gauche
-                && !georgesAGauche);
-
-        var conditionAttaque = Math.abs(georgesX - arthurX) < distanceLimiteAttaque &&
-            !conditionDemiTour;
-
-        // Georges fait un demi-tour quand il a Arthur derrière lui mais seulement si Arthur n'est pas en train de sauter. Pour que le demi-tour ne soit systématique, un flag booleen qui le conditionne change de valeur toutes les 2,5s
-        if (conditionDemiTour && !arthur.saute.statut && flagDemiTour) {
-            georges.direction.droite = !georges.direction.droite;
-            georges.direction.gauche = !georges.direction.gauche;
-        }
-
-        // Georges attaque si Arthur est à sa portée mais pas systématiquement. Une fonction aléatoire détermine s'il attaque ou non
-
-        if (conditionAttaque) {
-
-            // instanciation d'un objet décisionAttaque
-            if (!decisionAttaque) {
-                decisionAttaque = new DecisionAttaque();
-                if (decisionAttaque.aleatoire()) {
-                    georges.initStatuts();
-                    georges.attaque.statut = true;
-                    georgesAction('attaque');
-                    return;
-                }
-            }
-
-            // La décision d'attaquer est prise
-            if (decisionAttaque.attaqueOk) {
-
-                // décision prise moins de 2 secondes avant, Georges attaque
-                if (Date.now() - decisionAttaque.dateAttaqueOk < 2000) {
-                    georges.initStatuts();
-                    georges.attaque.statut = true;
-                    georgesAction('attaque');
-                    return;
-                }
-
-                // décision prise plus de 2 secondes avant, Georges reprend sa course
-                georges.initStatuts();
-                georges.court.statut = true;
-                georgesAction('court');
-
-                decisionAttaque = null;
-
-                // Test Collision avec les murs 
-                if (collision.checkMurs(georges.direction, $georgesMasque, 10)) {
-                    //Georges fait demi-tour
-                    georges.direction.droite = !georges.direction.droite;
-                    georges.direction.gauche = !georges.direction.gauche;
-                }
-                return;
-            }
-
-            // il est décidé de ne pas attaquer
-            if (decisionAttaque.attaqueKo) {
-
-                // décision prise moins de 2 secondes avant, Georges reste en course
-                if (Date.now() - decisionAttaque.dateAttaqueKo < 2000) {
-                    georges.initStatuts();
-                    georges.court.statut = true;
-                    georgesAction('court');
-                    // Test Collision avec les murs  
-                    if (collision.checkMurs(georges.direction, $georgesMasque, 5)) {
-                        //Georges fait demi-tour
-                        georges.direction.droite = !georges.direction.droite;
-                        georges.direction.gauche = !georges.direction.gauche;
-                    }
-                    return;
-                }
-
-                decisionAttaque = null;
-            }
-
-        } else
-        // Arthur est hors de portée d'attaque, Georges court...        
-        {
-            georges.initStatuts();
-            georges.court.statut = true;
-            georgesAction('court');
-            // Test collision avec les murs 
-            if (collision.checkMurs(georges.direction, $georgesMasque, 5)) {
-                //Georges fait demi-tour
-                georges.direction.droite = !georges.direction.droite;
-                georges.direction.gauche = !georges.direction.gauche;
-            }
-
-        }
-
-    }
-
-
-    //**************************************************************************/
-    //*                                                                        */
-    //*    INITIALISATION A L'ARRIVEE SUR L'APPLICATION                        */
-    //*                                                                        */
-    //**************************************************************************/
-
-    // fonctions pour calculer les positions des personnages aléatoirement (merci MDN)
-    var nbAleatoire = function (min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    var calculPositions = function () {
-        var positions = {
-            arthur: 0,
-            georges: 0
-        }
-
-        if (nbAleatoire(0, 1)) {
-            positions.arthur = nbAleatoire(6, 8) * 10;
-            positions.georges = nbAleatoire(2, 4) * 10;
-        } else {
-            positions.georges = nbAleatoire(6, 8) * 10;
-            positions.arthur = nbAleatoire(2, 4) * 10;
-        }
-        return positions;
-    }
-
-    //*==========================================*/
-    //*     Déclaration des variables            */
-    //*==========================================*/
-
-    var rafIdTouches = null;
-
-    var flagPositionAleatoire = false;
-
-    var collision = new Collision();
-    var actionsCollision = new ActionsCollision();
-
-    // var angleFinAscension = Math.PI + Math.PI / 2;
-
-    // pour Arthur
-    var arthur = new ArthurPersonnage();
-    var $arthurMasque = $('#arthurMasque');
-    var bottomArthurMasque = $arthurMasque.css('bottom');
-    var intervalIdArthurAction = null;
-
-    // pour Georges
-    var $georgesMasque = $('#georgesMasque');
-    var georges = new GeorgesPersonnage();
-    var intervalIdGeorgesAction = null;
-    var intervalIdDeplacementGeorges = null;
-
-    var flagDemiTour = false;
-    setInterval(function () {
-        flagDemiTour = !flagDemiTour;
-    }, 2000);
-
-    var distanceLimiteAttaque = 85;
-
-    var DecisionAttaque = function () {
-        this.attaqueOk = false;
-        this.attaqueKo = false;
-        this.dateAttaqueOk = 0;
-        this.dateAttaqueKo = 0;
-        this.aleatoire = function () {
-            if (Math.round(Math.random())) {
-                this.dateAttaqueOk = Date.now();
-                this.attaqueOk = true;
-                return true;
-            } else {
-                this.dateAttaqueKo = Date.now();
-                this.attaqueKo = true;
-                return false;
-            }
-        }
-
-    };
-    var decisionAttaque = null;
-
-    // pour le score
-    var $blasonsMasque = $('#blasonsMasque');
-
-    var son = {
-        jouer: document.getElementById('sonJouer'),
-        blason: document.getElementById('sonBlason'),
-        gamelle: document.getElementById('sonGamelle'),
-        gagne: document.getElementById('sonGagne'),
-        perdu: document.getElementById('sonPerdu')
-    }
-
-    //*===========================================================================*/
-    //*         POSITIONNEMENT DES PERSONNAGES                                    */
-    //*---------------------------------------------------------------------------*/
-    //* Le jeu demarre :                                                          */ 
-    //* - les personnages ont une position initiales                              */ 
-    //*                                                                           */
-    //* Arthur prend une gamelle (il vacille) mais la partie n'est pas terminée:  */ 
-    //* - les personnages sont repositionnés                                      */
-    //* - le clavier doit être actif                                              */
-    //*                                                                           */
-    //* La partie est terminée :                                                  */
-    //* - les personnages sont repositionnés                                      */
-    //* - le clavier doit désactivé, il sera réactivé si choix de rejouer         */
-    //*===========================================================================*/
-
-
-    // mise en mouvement des personnages  
-    var miseEnMouvementPersonnages = function () {
-
-        // Arthur
-        arthur.actionPrecedente = 'attend';
-        initArthurAttend();
-        intervalIdArthurAction = setInterval(arthurAttend, arthur.attend.vitesse);
-
-        // Georges
-        georges.actionPrecedente = 'attend';
-        georgesAttend();
-    }
-
-    // Calcul aléatoire des positions de départ des personnages quand on rejoue
-    var initPositionPersonnages = function () {
-
-        var positionArthur, positionGeorges;
-
-        if (flagPositionAleatoire) {
-            var positions = calculPositions();
-            positionArthur = positions.arthur + '%';
-            positionGeorges = positions.georges + '%';
-        } else {
-            positionArthur = 20 + '%';
-            positionGeorges = 80 + '%';
-        }
-
-        flagPositionAleatoire = true;
-
-        // Arthur
-        //---------
-        arthur.initDirection(true, false);
-        initIndicesArthur();
-        $arthurMasque.css({ left: positionArthur }, { bottom: '50px' });
-
-        // Georges
-        //----------
-        clearInterval(intervalIdDeplacementGeorges);
-        georges.initDirection(false, true);
-        initIndicesGeorges();
-        $georgesMasque.css({ left: positionGeorges });
-
-        // Mise en mouvement des personnages
-        miseEnMouvementPersonnages();
-
-    }
-
-    // initialisation des propriétés des variables objet
-    var initialisationVariables = function () {
-
-        scoreJeu.initialisation();
-        scoreJeu.afficheScore();
-        $blasonsMasque.width(0);
-        flagPositionAleatoire = false;
-
-        clavier.actif = true;
-        clavier.touches.keyup = true;
-
-    }
-
-    //*******************************************************************************************************/
-    //*                                GESTION DES EVENEMENTS                                               */
-    //*******************************************************************************************************/
-
     //*=====================================================================================================*/
-    //*                                Déplacement d'Arthur avec les touches                                */
+    //*                         GESTION DES EVENEMENTS DE TOUCHES                                           */
     //*-----------------------------------------------------------------------------------------------------*/
     //*  Arthur se déplace en fonction de l'appui des touches directionnelles et la barre espace.           */
     //*                                                                                                     */
@@ -1619,8 +1326,435 @@ $(function () {
         clavier.touches.keyup = true;
     });
 
+    //*=================================================================================================*/
+    //*               PILOTAGE DES DEPLACEMENTS D'ARTHUR                                                */
+    //*-------------------------------------------------------------------------------------------------*/
+    //*  Un flag booléen est associé à chacune des touches de déplacement d'Arthur : true si appuyée,   */ 
+    //*  false sinon. Un flag est également défini pour gérer le fait qu'aucune touche est appuyée.     */
+    //*                                                                                                 */  
+    //*  La variable "piloteDeplacementsArthur" référence la fonction qui pilote les opérations pour    */ 
+    //*  - analyser des flags des touches et décider de l'action à engager                              */
+    //*  - invoquer la fonction "arthurAction" avec en argument le nom d'une action 'pas à pas'         */
+    //*  - invoquer les méthodes de détection de collision pour une action 'pas à pas'                  */
+    //*  - invoquer les méthodes de gestion des conséquences suite à détection d'une collision          */
+    //*  - invoquer avec un setInterval les fonctions des actions à dérouler complètement               */
+    //*                                                                                                 */
+    //*  C'est une fonction qui se répète avec un requestAnimationFrame.                                */
+    //*=================================================================================================*/
+
+    var piloteDeplacementsArthur = function () {
+
+        // Arthur veut aller à gauche, initialisation de sa direction        
+        if (clavier.touches.gauche) {
+            arthur.initDirection(false, true)
+        }
+
+        // Arthur veut aller à gauche, initialisation de sa direction
+        if (clavier.touches.droite) {
+            arthur.initDirection(true, false)
+        }
+
+        // qq soit la direction, test des collisions avec les murs et avec Georges
+        if ((clavier.touches.gauche) || (clavier.touches.droite)) {
+
+            arthur.initStatuts();
+            arthur.court.statut = true;
+            arthurAction('court');
+
+            // test de la collision avec les murs
+            if (collision.checkMurs(arthur.direction, $arthurMasque, 20)) {
+                actionsCollision.gereConsequences();
+            } else {// tests collisison avec georges
+                collision.initialisation();
+                if (collision.checkCollisionGeorges()) {
+                    collision.avecGeorges = true;
+                    actionsCollision.gereConsequences();
+                }
+            }
+
+        }
+
+        // Arthur veut sauter
+        if (clavier.touches.haut) {
+            // Exécution du saut complet (jump + fall)
+            initArthurSaute();
+            arthur.initStatuts();
+            arthur.saute.statut = true;
+            intervalIdArthurAction = setInterval(arthurSaute, arthur.saute.vitesse);
+        }
+
+        // Arthur veut attaquer
+        if (clavier.touches.espace) {
+            // Exécution d'une attaque complète
+            initArthurAttaque();
+            arthur.initStatuts();
+            arthur.attaque.statut = true;
+            intervalIdArthurAction = setInterval(arthurAttaque, arthur.attaque.vitesse);
+        }
+
+        // A flag keyup à true càd aucune touche de déplacement n'est appuyée
+        if (clavier.touches.keyup) {
+
+            // Le clavier est actif, Arthur est mis en attente
+            if (clavier.actif) {
+                clavier.reinitTouches();
+                if (actionArthurAttend) {
+                    clearInterval(intervalIdArthurAction);
+                    actionArthurAttend = false;
+                }
+                initArthurAttend();
+                intervalIdArthurAction = setInterval(function () {
+                    actionArthurAttend = true;
+                    arthurAttend();
+                }, arthur.attend.vitesse);
+
+            }
+        }
+
+        requestAnimationFrame(piloteDeplacementsArthur);
+
+    };
+
+    //*===================================*/
+    //*      LES ACTIONS DE GEORGES       */
+    //*===================================*/
+
+    // indices de la table des sprites de chaque action 
+    var indiceGeorges = {
+        attend: 0,
+        court: 0,
+        saute: 0,
+        attaque: 0,
+        vacille: 0,
+        ko: 0
+    };
+    var initIndicesGeorges = function () {
+        indiceGeorges.applati = 0;
+        indiceGeorges.attaque = 0;
+        indiceGeorges.attend = 0;
+        indiceGeorges.court = 0;
+        indiceGeorges.vacille = 0;
+    }
+
+    //-------------------------------------------------------------------------------------------------------/
+    //  Fonction générique appelée pour l'exécution d'un pas pour une action donnée.                         /
+    //  Elle gère l'indice de la table des sprites de l'action et appelle la méthode "action" de l'objet     /
+    //  "unMouvementSprite" en passant le personnage et le masque de Georges, le nom de l'action et l'indice /
+    //  du sprite en cours.                                                                                  /
+    //-------------------------------------------------------------------------------------------------------/
+
+    var georgesAction = function (nomAction) {
+        //quand on arrive au dernier sprite de l'action on reboucle sur le 1er 
+        if (!georges[nomAction].sprites[indiceGeorges[nomAction]]) {
+            indiceGeorges[nomAction] = 0;
+        }
+
+        //Si c'est une nouvelle action on met à jour les propriétés actionPrecedente et le statut correspondant 
+        if (nomAction !== georges.actionPrecedente) {
+            indiceGeorges[georges.actionPrecedente] = 0;
+            georges[georges.actionPrecedente].statut = false;
+            georges.actionPrecedente = nomAction;
+            georges[nomAction].statut = true;
+
+        }
+
+        //Le personnage de georges effectue un pas de déplacement
+        unMouvementSprite.action(georges, '#georges', nomAction, indiceGeorges[nomAction]);
+        indiceGeorges[nomAction]++;
+    }
+
+    //-----------------------------------------------------------------------------------------------------/
+    //  Fonctions appelées pour l'éxécution de l'action "applati" suite à une collision avec Arthur : une  / 
+    //  fonction d'initialisation et la fonction d'applatissement (?) proprement dite.                     /
+    //-----------------------------------------------------------------------------------------------------/
+    var initGeorgesApplati = function () {
+        georges.applati.statut = true;
+    };
+
+    // Fonction appelée avec un setInterval. Elle appelle la fonction "georgesAction" avec l'argument "applati".
+    var georgesApplati = function () {
+        if (!georges.applati.sprites[indiceGeorges.applati]) {
+            clearInterval(intervalIdGeorgesAction);
+            indiceGeorges.applati = 0;
+            return;
+        }
+        georgesAction('applati');
+    };
+
+    //--------------------------------------------------------------------------------------------------/
+    //  Fonction appelée pour l'éxécution de l'attente suite à une collision avec Arthur.               /
+    //  Appelée avec un setInterval, elle appelle la fonction "georgesAction" avec l'argument "attend". / 
+    //--------------------------------------------------------------------------------------------------/
+
+    var georgesAttend = function () {
+        clearInterval(intervalIdGeorgesAction);
+        georges.initStatuts();
+        georges.attend.statut = true;
+        intervalIdGeorgesAction = setInterval(function () {
+            georgesAction('attend')
+        }, georges.attend.vitesse);
+    };
+
+    //--------------------------------------------------------------------------------------------------/
+    //  Fonction appelée pour l'éxécution du vacillement suite à une collision avec Arthur.             /
+    //  Appelée avec un setInterval, elle appelle la fonction "georgesAction" avec l'argument "vacille"./ 
+    //--------------------------------------------------------------------------------------------------/
+    var georgesVacille = function () {
+        clearInterval(intervalIdGeorgesAction);
+        georges.initStatuts();
+        georges.vacille.statut = true;
+        intervalIdGeorgesAction = setInterval(function () {
+            georgesAction('vacille')
+        }, georges.vacille.vitesse);
+    };
+
+    //*=================================================================================================*/
+    //*               PILOTAGE DES DEPLACEMENTS DE GEORGES                                              */
+    //*-------------------------------------------------------------------------------------------------*/ 
+    //*  La variable "piloteDeplacementsGeorges" référence la fonction qui pilote les opérations pour   */
+    //*  les actions 'pas à pas' telles que "court" et attaque" :                                       */
+    //*  - invoquer la fonction "georgesAction" avec en argument le nom de l'action                     */
+    //*  - invoquer les méthodes de détection de collision avec les murs                                */
+    //*  - invoquer les méthodes de gestion des conséquences suite à détection d'une collision avec un  */     //*    un mur                                                                                       */
+    //*                                                                                                 */
+    //*  Lorsque le jeu démarre ou reprend après une collision, Georges court dans la direction         */
+    //*  d'initialisation. Son comportement change dans les cas suivant :                               */
+    //*                                                                                                 */
+    //*  1) Si Georges n'est pas face à Arthur, il fait demi-tour mais ce n'est pas systématique. Un    */
+    //*   booléen "flagDemiTour" initialisé à false et mis à jour périodiquement avec sa valeur         */
+    //*   contraire. Le demi-tour n'est exécuté qui si ce flag est 'true'.                              */
+    //*                                                                                                 */
+    //*  2) Si Arthur est face à lui et est à sa portée (on définit une distance limite d'attaque),     */
+    //*  Georges attaque mais ce n'est pas systématique. La décision d'attaquer ou de ne pas attaquer   */
+    //*  est décidé aléatoirement et est valide pendant 2s. C'est géré avec une instance de l'objet     */
+    //*  DecisionAttaque.                                                                               */
+    //*                                                                                                 */
+    //*  La fonction pilote est appelée avec un setInterval au démarrage du jeu. La propriété "vitesse" */
+    //*  du personnage contient le délai de répétition.                                                 */
+    //*  La répétition est interrompue quand une collision avec Arthur est détectée ou quand le jeu est */
+    //*  terminé (perdu ou gagné). Elle reprend après le traitement de la collision ou quand on rejoue. */
+    //*=================================================================================================*/
+
+    var piloteDeplacementsGeorges = function () {
+        clearInterval(intervalIdGeorgesAction);
+
+        //--------------------------------------------------------------------------------------------/
+        //  Les variables suivantes permettent de déterminer les conditions pour un demi-tour et une  /
+        //  attaque.                                                                                  /
+        //--------------------------------------------------------------------------------------------/
+
+        var georgesAGauche = $georgesMasque.offset().left < $arthurMasque.offset().left;
+
+        var arthurX, georgesX;
+        if (georgesAGauche) {
+            arthurX = $arthurMasque.offset().left;
+            georgesX = $georgesMasque.offset().left + $georgesMasque.width();
+        } else {
+            arthurX = $arthurMasque.offset().left + $arthurMasque.width();
+            georgesX = $georgesMasque.offset().left;
+        }
+
+        // Variable de la condition dans laquelle Georges peut faire 1/2 tour pour faire face à Arthur
+        var conditionDemiTour = (georges.direction.gauche
+            && georgesAGauche) || (georges.direction.droite
+                && arthur.direction.gauche
+                && !georgesAGauche);
+
+        // Variable de la condition dans laquelle Georges peut attaquer
+        var conditionAttaque = Math.abs(georgesX - arthurX) < distanceLimiteAttaque &&
+            !conditionDemiTour;
+
+        // Georges ne fait un demi-tour que si Arthur n'est pas en train de sauter (sinon c'est chaud pour Arthur!) et que le flag demi-tour est à true
+        if (conditionDemiTour && !arthur.saute.statut && flagDemiTour) {
+            georges.direction.droite = !georges.direction.droite;
+            georges.direction.gauche = !georges.direction.gauche;
+        }
+
+        // Georges peut attaquer si Arthur est à sa portée
+        if (conditionAttaque) {
+
+            // instanciation d'un objet décisionAttaque
+            if (!decisionAttaque) {
+                decisionAttaque = new DecisionAttaque();
+                // Une fonction décide aléatoirement d'une attaque ou non
+                if (decisionAttaque.aleatoire()) {
+                    georges.initStatuts();
+                    georges.attaque.statut = true;
+                    georgesAction('attaque');
+                    return;
+                }
+            }
+
+            // La décision d'attaquer est prise
+            if (decisionAttaque.attaqueOk) {
+
+                // Si décision prise moins de 2 secondes avant, Georges attaque
+                if (Date.now() - decisionAttaque.dateAttaqueOk < 2000) {
+                    georges.initStatuts();
+                    georges.attaque.statut = true;
+                    georgesAction('attaque');
+                    return;
+                }
+
+                // Si décision prise plus de 2 secondes avant, Georges reprend sa course
+                georges.initStatuts();
+                georges.court.statut = true;
+                georgesAction('court');
+
+                decisionAttaque = null;
+
+                // Test Collision avec les murs 
+                if (collision.checkMurs(georges.direction, $georgesMasque, 10)) {
+                    //Georges fait demi-tour
+                    georges.direction.droite = !georges.direction.droite;
+                    georges.direction.gauche = !georges.direction.gauche;
+                }
+                return;
+            }
+
+            // il est décidé de ne pas attaquer
+            if (decisionAttaque.attaqueKo) {
+
+                // Si décision prise moins de 2 secondes avant, Georges reste en course                
+                if (Date.now() - decisionAttaque.dateAttaqueKo < 2000) {
+                    georges.initStatuts();
+                    georges.court.statut = true;
+                    georgesAction('court');
+                    // Test Collision avec les murs  
+                    if (collision.checkMurs(georges.direction, $georgesMasque, 10)) {
+                        //Georges fait demi-tour
+                        georges.direction.droite = !georges.direction.droite;
+                        georges.direction.gauche = !georges.direction.gauche;
+                    }
+                    return;
+                }
+
+                decisionAttaque = null;
+            }
+
+        } else
+        // Arthur est hors de portée d'attaque, Georges court...        
+        {
+            georges.initStatuts();
+            georges.court.statut = true;
+            georgesAction('court');
+            // Test collision avec les murs 
+            if (collision.checkMurs(georges.direction, $georgesMasque, 10)) {
+                //Georges fait demi-tour
+                georges.direction.droite = !georges.direction.droite;
+                georges.direction.gauche = !georges.direction.gauche;
+            }
+
+        }
+
+    }
+
+    //*=================================================================================================*/
+    //*                                                             */
+    //*-------------------------------------------------------------------------------------------------*/
+
+    //---------------------------------------------------------------------------------------/ 
+    //      Variables pour le positionnement des personnages                                 /
+    //---------------------------------------------------------------------------------------/
+    // Le jeu demarre :                                                                      / 
+    // - les personnages ont une position initiale                                           / 
+    //                                                                                       /
+    // Après le traitement d'une collision détectée et que la partie n'est pas terminée      / 
+    // - les personnages sont repositionnés aléatoirement (fonctions "nbAleatoire" et        /
+    //   calculPositions)                                                                    /
+    // - le clavier est réactivé                                                             /
+    //                                                                                       /
+    // La partie est terminée :                                                              /
+    // - les personnages sont repositionnés avec une fonction aléatoire                      /
+    // - le clavier doit être désactivé, il sera réactivé si choix de rejouer                /
+    //---------------------------------------------------------------------------------------/
+
+    var flagPositionAleatoire = false; // positionné à true quand la 1ère partie est démarré
+
+    var nbAleatoire = function (min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+
+    var calculPositions = function () {
+        var positions = {
+            arthur: 0,
+            georges: 0
+        }
+
+        if (nbAleatoire(0, 1)) {
+            positions.arthur = nbAleatoire(6, 8) * 10;
+            positions.georges = nbAleatoire(2, 4) * 10;
+        } else {
+            positions.georges = nbAleatoire(6, 8) * 10;
+            positions.arthur = nbAleatoire(2, 4) * 10;
+        }
+        return positions;
+    }
+
+    //----------------------------------------------------/
+    //      Variables pour la gestion des collisions      /
+    //----------------------------------------------------/
+
+    var collision = new Collision();
+    var actionsCollision = new ActionsCollision();
+
+    var $blasonsMasque = $('#blasonsMasque');
+
+    //----------------------------------------------------/
+    //      Variables pour la gestion d'Arthur            /
+    //----------------------------------------------------/
+    var arthur = new ArthurPersonnage();
+    var $arthurMasque = $('#arthurMasque');
+    var bottomArthurMasque = $arthurMasque.css('bottom');
+    var intervalIdArthurAction = null;
+
+    //----------------------------------------------------/
+    //      Variables pour la gestion de Georges          /
+    //----------------------------------------------------/
+    var $georgesMasque = $('#georgesMasque');
+    var georges = new GeorgesPersonnage();
+    var intervalIdGeorgesAction = null;
+    var intervalIdDeplacementsGeorges = null;
+
+    var flagDemiTour = false;
+    setInterval(function () {
+        flagDemiTour = !flagDemiTour;
+    }, 2000);
+
+    var distanceLimiteAttaque = 85;
+
+    var DecisionAttaque = function () {
+        this.attaqueOk = false;
+        this.attaqueKo = false;
+        this.dateAttaqueOk = 0;
+        this.dateAttaqueKo = 0;
+        this.aleatoire = function () {
+            if (Math.round(Math.random())) {
+                this.dateAttaqueOk = Date.now();
+                this.attaqueOk = true;
+                return true;
+            } else {
+                this.dateAttaqueKo = Date.now();
+                this.attaqueKo = true;
+                return false;
+            }
+        }
+
+    };
+    var decisionAttaque = null;
+
+    //  Ajustement des affichages à la hauteur de la fenêtre de l'écran  
+    var hauteur = $(window).height();
+
+    $('#accueil').height(hauteur - hauteur * 17 / 100);
+    $('#jeu').height(hauteur - hauteur * 19 / 100);
+    $('#scene').height(hauteur - hauteur * 40 / 100);
+    $('#iframeCv').height(hauteur - hauteur * 18 / 100);
+    
     //*=====================================================================================================*/
-    //*                                Déroulement du jeu                                                   */
+    //*                  GESTION DES EVENEMENTS AU DEMARRAGE D'UNE PARTIE DE JEU                            */
     //*-----------------------------------------------------------------------------------------------------*/
     //*  Trois écouteurs sont attachés aux clics des boutons "jouer", "baston", "baston again".             */
     //*                                                                                                     */ 
@@ -1636,6 +1770,66 @@ $(function () {
     //*  - la page de rejeu disparait et une nouvelle partie démarre.                                       */
     //*=====================================================================================================*/
 
+    // mise en mouvement des personnages  
+    var miseEnMouvementPersonnages = function () {
+
+        // Arthur
+        arthur.actionPrecedente = 'attend';
+        initArthurAttend();
+        intervalIdArthurAction = setInterval(arthurAttend, arthur.attend.vitesse);
+
+        // Georges
+        georges.actionPrecedente = 'attend';
+        georgesAttend();
+    }
+
+    // Calcul aléatoire des positions de départ des personnages quand on rejoue
+    var initPositionPersonnages = function () {
+
+        var positionArthur, positionGeorges;
+
+        if (flagPositionAleatoire) {
+            var positions = calculPositions();
+            positionArthur = positions.arthur + '%';
+            positionGeorges = positions.georges + '%';
+        } else {
+            positionArthur = 20 + '%';
+            positionGeorges = 80 + '%';
+        }
+
+        flagPositionAleatoire = true;
+
+        // Arthur
+        //---------
+        arthur.initDirection(true, false);
+        initIndicesArthur();
+        $arthurMasque.css({ left: positionArthur }, { bottom: '50px' });
+
+        // Georges
+        //----------
+        clearInterval(intervalIdDeplacementsGeorges);
+        georges.initDirection(false, true);
+        initIndicesGeorges();
+        $georgesMasque.css({ left: positionGeorges });
+
+        // Mise en mouvement des personnages
+        miseEnMouvementPersonnages();
+
+    }
+
+    // initialisation des propriétés des variables objet
+    var initialisationVariables = function () {
+
+        scoreJeu.initialisation();
+        scoreJeu.afficheScore();
+        $blasonsMasque.width(0);
+        flagPositionAleatoire = false;
+
+        clavier.actif = true;
+        clavier.touches.keyup = true;
+
+    }
+
     // Fonction pour cacher les règles du jeu et la page de rejeu et afficher/réafficher les éléments et protagonistes du jeu  
     var initStylePageJeu = function () {
         $('#rdj').css('display', 'none');
@@ -1646,15 +1840,7 @@ $(function () {
     // Fonction d'affichage de la page de rejeu
     var afficherPageRejeu = function () {
         $('#rejouer').css('display', 'flex').height($('#scene').height()).width($('#scene').width());
-    }
-    
-    //  Ajustement des affichages à la hauteur de la fenêtre de l'écran  
-    var hauteur = $(window).height();
-
-    $('#accueil').height(hauteur - hauteur * 17 / 100);
-    $('#jeu').height(hauteur - hauteur * 19 / 100);
-    $('#scene').height(hauteur - hauteur * 40 / 100);
-    $('#iframeCv').height(hauteur - hauteur * 18 / 100);
+    }    
 
     //------------------------------------------------------------/
     //  Evénement clic sur bouton "jouer" de la page d'accueil    / 
@@ -1674,7 +1860,7 @@ $(function () {
 
         // Apparition des liens vers l'accueil et vers le CV
         $('#imgAccueil').animate({ top: '-15px' }, 1700);
-        $('#imgMonCv').delay(500).animate({ top: '0px' }, 1700);       
+        $('#imgMonCv').animate({ top: '0px' }, 2500);
 
     });
 
@@ -1684,7 +1870,7 @@ $(function () {
 
     $('#btnBaston').click(function () {
 
-        son.jouer.play();
+        scoreJeu.son.jouer.play();
 
         initialisationVariables();
 
@@ -1695,10 +1881,10 @@ $(function () {
         initPositionPersonnages();
 
         // démarrer la gestion des touches de déplacement d'Arthur     
-        gestionTouches();
+        piloteDeplacementsArthur();
 
         clearInterval(intervalIdGeorgesAction);
-        intervalIdDeplacementGeorges = setInterval(deplacementGeorges, georges.vitesse);
+        intervalIdDeplacementsGeorges = setInterval(piloteDeplacementsGeorges, georges.vitesse);
 
     });
 
@@ -1710,7 +1896,7 @@ $(function () {
         // on stoppe l'animation du lien vers le CV
         $('#imgMonCv').removeClass('yoyo');
 
-        son.jouer.play();
+        scoreJeu.son.jouer.play();
 
         initialisationVariables();
 
@@ -1721,7 +1907,7 @@ $(function () {
         initPositionPersonnages();
 
         clearInterval(intervalIdGeorgesAction);
-        intervalIdDeplacementGeorges = setInterval(deplacementGeorges, georges.vitesse);
+        intervalIdDeplacementsGeorges = setInterval(piloteDeplacementsGeorges, georges.vitesse);
 
     });
 
