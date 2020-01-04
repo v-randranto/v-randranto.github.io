@@ -760,7 +760,7 @@ $(function () {
                     if ((arthur.direction.droite !== georges.direction.droite) && georges.attaque.statut) {
                         initArthurKo();
                         intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
-                        georgesAttend();
+                        //georgesAttend(); supprimé car parfois, on ne voit pas bien qu'il a attaqué
                         scoreJeu.rejeuDirect();
 
                         return;
@@ -788,7 +788,7 @@ $(function () {
                 // Arthur tombe sur les cornes 
                 initArthurKo();
                 intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
-                georgesAttend();
+                //georgesAttend(); supprimé car parfois, on ne voit pas bien qu'il a attaqué
                 scoreJeu.rejeuDirect();
                 return;
             }
@@ -800,7 +800,7 @@ $(function () {
                 if (georges.attaque.statut) {
                     initArthurKo();
                     intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
-                    georgesAttend();
+                    //georgesAttend(); supprimé car parfois, on ne voit pas bien qu'il a attaqué
                     scoreJeu.rejeuDirect();
                     return;
                 }
@@ -817,7 +817,7 @@ $(function () {
                 // Arthur court et Georges attend ou vice-versa => Arthur vacille, +1 gamelle
                 initArthurVacille();
                 intervalIdArthurAction = setInterval(arthurVacille, arthur.vacille.vitesse);
-                georgesAttend();
+                //georgesAttend(); supprimé car parfois, on ne voit pas bien qu'il a attaqué
                 scoreJeu.incrementGamelles();
                 return;
             }
@@ -828,7 +828,7 @@ $(function () {
                 if (georges.attaque.statut) {
                     initArthurKo();
                     intervalIdArthurAction = setInterval(arthurKo, arthur.ko.vitesse);
-                    georgesAttend();
+                    //georgesAttend(); supprimé car parfois, on ne voit pas bien qu'il a attaqué
                     scoreJeu.proposeRejeu();
                     return;
                 }
