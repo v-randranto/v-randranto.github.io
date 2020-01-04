@@ -22,8 +22,8 @@
 //*  Coup fatal, l'encornage par Georges :                                                     */
 //*  -------------------------------------                                                     */ 
 //*  1) Arthur attaque ou percute Georges alors que celui-ci est en position d'attaque         */
-//*  2) Arthur saute et retombe sur les cornes relevées de Geooges                             */
-//*  Dans ces 2 cas la partie est perdu pour Arthur.                                           */
+//*  2) Arthur saute et retombe sur les cornes relevées de Georges                             */
+//*  Dans ces 2 cas la partie est perdue pour Arthur.                                          */
 //**********************************************************************************************/
 
 $(function () {
@@ -45,15 +45,23 @@ $(function () {
     //*    . une table des positions et tailles des sprites concernés                                 */
     //*    . le statut de l'action                                                                    */
     //*    . le nombre de pixels pour un pas de déplacement, dans le cas du saut en demi-cercle       */       //*      ce sont des radians                                                                      */
-    //*    . un booléen qui indique si on reboucle sur le 1er sprite quand on arrive au dernier       */
+    //*    . un booléen(*) qui indique si on reboucle sur le 1er sprite quand on arrive au dernier    */
     //*      sprite de la table                                                                       */
+    //*    . en cas de rebouclage(*), le nombre de rebouclages                                        */
     //*    . une vitesse si l'action est déroulée avec une fonction répétée (avec setInterval).       */ 
     //*                                                                                               */
     //*  Il y a aussi des méthodes d'initialisation des propriétés.                                   */
     //*                                                                                               */
     //*  Pour dérouler une action, on accède à sa table de sprites et on la parcourt pour exécuter    */
     //*  un pas par sprite :                                                                          */
-    //*  - ajustement du masque d'Arthur avec les dimensions du sprite accédé                         */       //*  - positionnement du sprite dans le masque                                                    */       //*  - déplacement du masque selon le pas indiqué (le pas peut être nul)                          */  
+    //*  - ajustement du masque d'Arthur avec les dimensions du sprite accédé                         */       //*  - positionnement du sprite dans le masque                                                    */       //*  - déplacement du masque selon le pas indiqué (le pas peut être nul)                          */
+    //*                                                                                               */
+    //*  Le déplacement des personnages est géré de deux façons selon l'action :                      */
+    //*  - chaque pas est déclenché indépendemment, ex. sur l'action "court", Arthur avance d'un pas  */
+    //*    à chaque appui d'une touche directionnelle droite/gauche                                   */  
+    //*  - tous les pas de l'action sont déroulés d'un coup, ex. sur l'action "attaque", tous les     */
+    //*    sont déroulés à l'appui de la touche espace .                                              */
+    //*  (*) c'est pour le 2ème cas que l'on gère la notion de rebouclage.                            */  
     //*************************************************************************************************/
 
     //*============================================================================================*/
@@ -70,10 +78,10 @@ $(function () {
     //*  - à chaque appui on accède au sprite suivant. Quand le dernier est atteint, on retourne   */
     //*    au 1er. Ex. de l'action "court" avec les flêches directionnelles droite/gauche          */
     //*                                                                                            */  
-    //*  2) L'appui d'une touche déclenche le déroulement complet d'une action : nécessite donc la */          //*  répétition de l'éxécution d'un pas (setInterval).                                         */
+    //*  2) L'appui d'une touche déclenche le déroulement complet d'une action : nécessite donc la */          //*  répétition de l'éxécution d'un pas.                                                       */
     //*  La répétition prend fin quand :                                                           */
     //*    . le dernier sprite est atteint, ex. action "saut" avec la flêche vers le haut          */
-    //*    . tous les sprites ont été parcourus un nombre déterminé de fois (rebouclage),           */
+    //*    . tous les sprites ont été parcourus un nombre déterminé de fois (rebouclage),          */
     //*      ex. action "attaque" avec la barre espace                                             */ 
     //*  Une propriété de l'action, nombre de boucles, permet de gérer le rebouclage.              */
     //*  Une propriété de l'action, vitesse, indique le délai à appliquer entre chaque répétion.   */ 
@@ -286,7 +294,7 @@ $(function () {
     //*                                                                                            */
     //*  3) Une collision avec Arthur interrompt la fonction pilote et déclenche le déroulement    */
     //*  complet d'une action :                                                                    */
-    //*  - Georges "attend" après avoir encorné Arthur ou qu'Arthur l'ait percuté                  */
+    //*  - Georges "attend" après qu'Arthur l'ait percuté                                          */
     //*  - il "vacille" si Arthur l'attaque avec succès                                            */
     //*  - il est "applati" si Arthur lui saute sur le dos.                                        */
     //*  Comme pour Arthur, le déroulement complet d'une action est l'exécution répétée d'un pas   */          //*  de déplacement.                                                                           */
@@ -450,7 +458,7 @@ $(function () {
         nbGamelles: 0,
         gagne: false,
         perdu: false,
-        son : {
+        son: {
             jouer: document.getElementById('sonJouer'),
             blason: document.getElementById('sonBlason'),
             gamelle: document.getElementById('sonGamelle'),
@@ -556,10 +564,10 @@ $(function () {
     //*  Les collisions suivantes sont détectées et gérées :                                     */
     //*                                                                                          */
     //*  - contre les murs:                                                                      */
-    //*    . Arthur pendant sa course ou un saut : il prend une gamelle et "vacille"             */
-    //*    . Georges pendant sa cours : il fait demi-tour et continue sa course                  */
-    //*                                                                                          */            //*  - entre Arthur et Georges:                                                              */            //*    . Si Georges encorne Arthur (quoi qu'il fasse), celui est "ko", Georges "attend" et   */ 
-    //*      est perdue pour Arthur                                                              */            //*    . Si Arthur saute sur le dos de Georges, il est "content" car il gagne 3 blasons et   */
+    //*    . Arthur "court" ou "saute" et se mange le mur: il prend une gamelle et "vacille"     */
+    //*    . Georges "court" et approche un mur: il fait demi-tour.                              */
+    //*                                                                                          */            //*  - entre Arthur et Georges:                                                              */            //*    . Si Georges encorne Arthur (quoi que ce dernier fasse), celui-ci est "ko", Georges   */ 
+    //*      "attend" et la partie est perdue pour Arthur                                        */            //*    . Si Arthur saute sur le dos de Georges, il est "content" car il gagne 3 blasons et   */
     //*      Georges est "applati"                                                               */
     //*    . Si Arthur attaque et atteint Georges de face, il est "content" car il gagne 2       */
     //*      blasons et Georges "vacille".                                                       */
@@ -1333,13 +1341,16 @@ $(function () {
     //*  false sinon. Un flag est également défini pour gérer le fait qu'aucune touche est appuyée.     */
     //*                                                                                                 */  
     //*  La variable "piloteDeplacementsArthur" référence la fonction qui pilote les opérations pour    */ 
-    //*  - analyser des flags des touches et décider de l'action à engager                              */
+    //*  - analyser les flags des touches et décider de l'action à engager                              */
     //*  - invoquer la fonction "arthurAction" avec en argument le nom d'une action 'pas à pas'         */
     //*  - invoquer les méthodes de détection de collision pour une action 'pas à pas'                  */
     //*  - invoquer les méthodes de gestion des conséquences suite à détection d'une collision          */
     //*  - invoquer avec un setInterval les fonctions des actions à dérouler complètement               */
     //*                                                                                                 */
     //*  C'est une fonction qui se répète avec un requestAnimationFrame.                                */
+    //*                                                                                                 */
+    //*  Le recours aux flags pour les touches et au requestAnimationFrame pour la gestion des touches  */
+    //*  évite le délai de réaction constaté au 1er appui d'une touche donnée.                           */
     //*=================================================================================================*/
 
     var piloteDeplacementsArthur = function () {
@@ -1649,10 +1660,10 @@ $(function () {
 
     }
 
-    //*=================================================================================================*/
-    //*                                                             */
-    //*-------------------------------------------------------------------------------------------------*/
-
+    //*******************************************************************/
+    //*          DEMARRAGE DE L'APPLICATION ET DU JEU                   */
+    //*******************************************************************/
+    
     //---------------------------------------------------------------------------------------/ 
     //      Variables pour le positionnement des personnages                                 /
     //---------------------------------------------------------------------------------------/
@@ -1745,14 +1756,17 @@ $(function () {
     };
     var decisionAttaque = null;
 
-    //  Ajustement des affichages à la hauteur de la fenêtre de l'écran  
+    //-------------------------------------------------------------------/
+    //  Ajustement des affichages à la hauteur de la fenêtre de l'écran  / 
+    //-------------------------------------------------------------------/
+
     var hauteur = $(window).height();
 
     $('#accueil').height(hauteur - hauteur * 17 / 100);
     $('#jeu').height(hauteur - hauteur * 19 / 100);
     $('#scene').height(hauteur - hauteur * 40 / 100);
     $('#iframeCv').height(hauteur - hauteur * 18 / 100);
-    
+
     //*=====================================================================================================*/
     //*                  GESTION DES EVENEMENTS AU DEMARRAGE D'UNE PARTIE DE JEU                            */
     //*-----------------------------------------------------------------------------------------------------*/
@@ -1840,7 +1854,7 @@ $(function () {
     // Fonction d'affichage de la page de rejeu
     var afficherPageRejeu = function () {
         $('#rejouer').css('display', 'flex').height($('#scene').height()).width($('#scene').width());
-    }    
+    }
 
     //------------------------------------------------------------/
     //  Evénement clic sur bouton "jouer" de la page d'accueil    / 
