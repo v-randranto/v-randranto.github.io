@@ -696,7 +696,7 @@ $(function () {
             }
 
             if (this.arthurData.x + 20 < georgesDataX + georgesDataW &&
-                this.arthurData.x - 20 + this.arthurData.w > georgesDataX &&
+                this.arthurData.x - 30 + this.arthurData.w > georgesDataX &&
                 this.arthurData.y + 20 < this.georgesData.y + this.georgesData.h &&
                 this.arthurData.h - 20 + this.arthurData.y > this.georgesData.y) {
                 this.sautSurDosGeorges = true;
