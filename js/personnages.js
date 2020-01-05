@@ -78,18 +78,18 @@
 //*  Cette fonction est appelée en mode répétition (setInterval) au démarrage du jeu.          */ 
 //*============================================================================================*/
 
-var ArthurPersonnage = function () {
-    this.actionPrecedente = null;
+var arthur = {
+    actionPrecedente: null,
 
     // sens de déplacement de l'action en cours
-    this.direction = {
+    direction: {
         droite: true, gauche: false
-    };
+    },
     // sprites orientés vers la droite
-    this.orientation = 1;
+    orientation: 1,
 
     // L'action "attaque" est déclenchée par la touche entrée et est déroulée par un setInterval. Arrivé au dernier sprite on reboucle.
-    this.attaque = {
+    attaque: {
         sprites: [
             { top: 30, left: -792, width: 118, height: 124 },
         ],
@@ -98,10 +98,10 @@ var ArthurPersonnage = function () {
         boucle: true,
         nbBoucles: 30,
         vitesse: 5
-    };
+    },
 
     // L'action "attente" est déclenchée quand aucune touche n'est appuyée, elle est déroulée avec un setInterval et s'arrête dès qu'une touche est appuyée
-    this.attend = {
+    attend: {
         sprites: [
             // les sprites sont répétés pour ne pas mettre une vitesse trop lente. Quand la vitesse est lente, Arthur parait figé le temps que l'attente se mette en place.
             { top: 2, left: -2, width: 83, height: 125 },
@@ -115,10 +115,10 @@ var ArthurPersonnage = function () {
         pas: 0,
         boucle: true,
         vitesse: 100
-    };
+    },
 
     // L'action "content" est déclenchée suite à une attaque réussie et est déroulée par un setInterval. Arrivé au dernier sprite on reboucle.
-    this.content = {
+    content: {
         sprites: [
             { top: 2, left: -2, width: 83, height: 125 },
             { top: 2, left: -87, width: 83, height: 125 },
@@ -128,10 +128,10 @@ var ArthurPersonnage = function () {
         boucle: true,
         nbBoucles: 10,
         vitesse: 80
-    };
+    },
 
     // L'action "court" est déclenché" par les touches flêches droite/gauche, à chaque appui Arthur se déplacement d'un pas. Quand on arrive au dernier sprite on reboucle.
-    this.court = {
+    court: {
         sprites: [
             { top: 0, left: -173, width: 86, height: 125 },
             { top: 0, left: -260, width: 86, height: 125 },
@@ -143,10 +143,10 @@ var ArthurPersonnage = function () {
         pas: 5,
         boucle: true,
         vitesse: 0
-    };
+    },
 
     // Le mouvement mise KO d'Arthur est déclenché quand il y a collision avec les cornes de Georges. Il est déroulé avec un setInterval qui prend fin au dernier sprite.
-    this.ko = {
+    ko: {
         sprites: [
             { top: 0, left: -911, width: 96, height: 143 },
             { top: 0, left: -1006, width: 96, height: 143 },
@@ -162,10 +162,10 @@ var ArthurPersonnage = function () {
         pas: -4,
         boucle: false,
         vitesse: 100
-    };
+    },
     // Le mouvement de saut est déclenché par une touche, déroulé avec un setInterval qui prend fin au dernier sprite. C'est un déplacement en demi-cercle selon un centre (x,y), le rayon et l'angle de départ, tous des propriétés du saut. Pour la gestion de la collision avec Georges, on distingue la phase ascendante et la descendante également propriétés du saut. Enfin, le pas est en radians. 
 
-    this.saute = {
+    saute: {
         // il n'y a que 2 sprites pour le saut (ascension, descente). Ils sont répétés pour avoir un sprite pour chaque pas de PI/30
         sprites: [
             { top: 0, left: -611, width: 85, height: 128 },
@@ -212,10 +212,10 @@ var ArthurPersonnage = function () {
         ascension: false, // initialisé à true au départ du saut, passe à false à la fin de cette phase
         descente: false, // initialisé à false au départ du saut, passe à true à la fin de l'ascension
         angleFinAscension: Math.PI + Math.PI / 2 //détermine la fin de la phase d'ascension
-    };
+    },
 
     // L'action "vacille" est déclenchée quand Arthur percute un mur ou Georges et déroulée avec un setInterval(). Arrivé au dernier sprite on reboucle.
-    this.vacille = {
+    vacille: {
         sprites: [
             { top: 0, left: -911, width: 96, height: 143 },
             { top: 0, left: -1006, width: 96, height: 143 },
@@ -225,16 +225,16 @@ var ArthurPersonnage = function () {
         boucle: true,
         nbBoucles: 5,
         vitesse: 100
-    };
+    },
 
     // méthode d'initialisation des directions droite/gauche
-    this.initDirection = function (droite, gauche) {
+    initDirection: function (droite, gauche) {
         this.direction.droite = droite;
         this.direction.gauche = gauche;
-    };
+    },
 
     // méthode d'initialisation du statut des actions
-    this.initStatuts = function () {
+    initStatuts: function () {
         this.attaque.statut = false;
         this.attend.statut = false;
         this.content.statut = false;
@@ -242,7 +242,7 @@ var ArthurPersonnage = function () {
         this.ko.statut = false;
         this.saute.statut = false;
         this.vacille.statut = false;
-    };
+    },
 
 };
 
@@ -276,19 +276,19 @@ var ArthurPersonnage = function () {
 //*  La fonction pilote reprend la main quand le traitement de la collision est terminée.      */
 //*============================================================================================*/
 
-var GeorgesPersonnage = function () {
+var georges = {
 
-    this.actionPrecedente = null;
+    actionPrecedente: null,
     // sens de déplacement en cours
-    this.direction = {
+    direction: {
         droite: false, gauche: true
-    };
-    this.vitesse = 42,
+    },
+    vitesse: 42,
         // les sprites de Georges sont tous orientés vers la gauche
-        this.orientation = -1,
+        orientation: -1,
 
         // Georges s'applatit quant Arthur lui saute sur le dos (collision)
-        this.applati = {
+        applati: {
             sprites: [
                 { top: -305, left: -832, width: 115, height: 105 },
                 { top: -305, left: -987, width: 122, height: 105 },
@@ -303,10 +303,10 @@ var GeorgesPersonnage = function () {
             pas: 0,
             boucle: false,
             vitesse: 80
-        };
+        },
 
     // Georges attaque quand Arthur est à sa portée
-    this.attaque = {
+    attaque: {
         sprites: [
 
             { top: 0, left: -804, width: 109, height: 91 },
@@ -325,10 +325,10 @@ var GeorgesPersonnage = function () {
         boucle: false,
         nbBoucles: 2,
         vitesse: 0
-    };
+    },
 
     // Georges attend au début de la partie et de chaque round (mais pas longtemps)
-    this.attend = {
+    attend: {
         sprites: [
             { top: -100, left: -2, width: 103, height: 99 },
             { top: -100, left: -107, width: 103, height: 99 },
@@ -350,10 +350,10 @@ var GeorgesPersonnage = function () {
         pas: 0,
         boucle: true,
         vitesse: 50
-    };
+    },
 
     // Georges court dès que la partie ou le round démarre, il cesse quand Arthur est à sa portée pour attaquer
-    this.court = {
+    court: {
         sprites: [
             { top: -415, left: -14, width: 101, height: 93 },
             { top: -417, left: -132, width: 105, height: 93 },
@@ -373,10 +373,10 @@ var GeorgesPersonnage = function () {
         pas: 7,
         boucle: true,
         vitesse: 0
-    };
+    },
 
     // Georges vacille quand Arthur lui porte un coup de face ou par derrière 
-    this.vacille = {
+    vacille: {
         sprites: [
             { top: -204, left: -2.5, width: 93, height: 96 },
             { top: -204, left: -126, width: 91, height: 96 },
@@ -394,20 +394,20 @@ var GeorgesPersonnage = function () {
         boucle: true,
         nbBoucles: 2,
         vitesse: 30
-    };
+    },
 
-    this.initDirection = function (droite, gauche) {
+    initDirection: function (droite, gauche) {
         this.direction.droite = droite;
         this.direction.gauche = gauche;
-    };
+    },
 
-    this.initStatuts = function () {
+    initStatuts: function () {
         this.applati.statut = false;
         this.attaque.statut = false;
         this.attend.statut = false;
         this.court.statut = false;
         this.vacille.statut = false;
-    };
+    },
 
 };
 

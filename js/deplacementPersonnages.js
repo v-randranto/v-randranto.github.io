@@ -11,7 +11,7 @@
 //*  Les actions à dérouler complètement avec ou sans rebouclage nécessitent d'appeler de façon répétée */
 //*  l'exécution d'un pas. Elles font l'objet d'une fonction spécifique à l'action et au personnage.    */
 //*  Elles sont appelées par les fonctions pilote (ex. Arthur "attend", "attaque" et "saute") ou par    */
-//*  les méthodes de l'instance ActionsCollision (ex. Arthur "vacille", "content" et "ko", Georges      */
+//*  les méthodes de l'objet actionsCollision (ex. Arthur "vacille", "content" et "ko", Georges         */
 //*  "attend", "vacille" et "applati".                                                                  */
 //*******************************************************************************************************/
 
@@ -793,7 +793,7 @@ var piloteDeplacementsGeorges = function () {
 //----------------------------------------------------/
 //      Variables pour la gestion d'Arthur            /
 //----------------------------------------------------/
-var arthur = new ArthurPersonnage();
+
 var $arthurMasque = $('#arthurMasque');
 var bottomArthurMasque = $arthurMasque.css('bottom');
 // var intervalIdArthurAction = null;
@@ -802,8 +802,7 @@ var bottomArthurMasque = $arthurMasque.css('bottom');
 //      Variables pour la gestion de Georges          /
 //----------------------------------------------------/
 var $georgesMasque = $('#georgesMasque');
-var georges = new GeorgesPersonnage();
-// var intervalIdGeorgesAction = null;
+
 var intervalIdDeplacementsGeorges = null;
 
 var flagDemiTour = false;

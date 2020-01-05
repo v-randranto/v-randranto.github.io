@@ -33,7 +33,7 @@
 //*  - entre Arthur et Georges                                                               */
 //*  - et si Arthur saute, la collision avec le dos ou les cornes de Georges                 */
 //*                                                                                          */
-//*  2) Une 'instance' de l'objet ActionsCollision permet:                                   */          
+//*  2) Une variable référençant l'objet ActionsCollision permet:                            */          
 //*  - de gérer les réactions des personnages suite à une collision: "content", "vacille",   */
 //*    "applati", "ko", "attend"                                                             */
 //*  - d'évaluer et d'enregistrer le score en faisant appel aux méthodes de "scoreJeu" qui   */
@@ -44,21 +44,21 @@
 //*       DETECTION DES COLLISIONS           / 
 //*==========================================/
 
-var Collision = function () {
+var collision = {
 
-    this.memeDirection = false;
-    this.frontal = false;
-    this.arthurDevant = false;
-    this.avecMur = false;
-    this.avecGeorges = false;
-    this.sautSurCornesGeorges = false;
-    this.sautSurDosGeorges = false;
-    this.arthurData = { x: 0, y: 0, w: 0, h: 0 };
-    this.georgesData = { x: 0, y: 0, w: 0, h: 0 };
-    this.murData = { x: 0, w: 0 };
+    memeDirection: false,
+    frontal: false,
+    arthurDevant: false,
+    avecMur: false,
+    avecGeorges: false,
+    sautSurCornesGeorges: false,
+    sautSurDosGeorges: false,
+    arthurData: { x: 0, y: 0, w: 0, h: 0 },
+    georgesData: { x: 0, y: 0, w: 0, h: 0 },
+    murData: { x: 0, w: 0 },
 
     // méthode appelée par les fonctions pilote des déplacements avant d'appeler les méthodes qui détectent les collisions. Elle initialise toutes les propriétés.
-    this.initialisation = function () {
+    initialisation: function () {
 
         // Arthur se trouve à gauche de Georges
         this.arthurAGauche = $arthurMasque.offset().left < $georgesMasque.offset().left;
@@ -98,10 +98,10 @@ var Collision = function () {
         this.murData.x = $('#scene').offset().left;
         this.murData.w = $('#scene').width();
 
-    };
+    },
 
     // méthode appelée par les fonctions pilote des déplacements pour détecter les collisions avec les murs
-    this.checkMurs = function (direction, $masque, marge) {
+    checkMurs: function (direction, $masque, marge) {
         this.initialisation();
         var $masqueData = {
             x: $masque.offset().left,
@@ -112,10 +112,10 @@ var Collision = function () {
             this.avecMur = true;
             return true;
         } else return false;
-    };
+    },
 
     // Collision d'Arthur avec les cornes de Georges pendant son saut
-    this.checkSautSurCornes = function () {
+    checkSautSurCornes: function () {
 
         // Allez, on s'accorde pour dire que les cornes sont 1/3 de la largeur de Georges
         var georgesDataX = this.georgesData.x,
@@ -135,10 +135,10 @@ var Collision = function () {
             return true;
         }
 
-    };
+    },
 
     // Collision d'Arthur avec le dos de Georges pendant son saut
-    this.checkSautSurDos = function () {
+    checkSautSurDos: function () {
 
         // le dos est sur 2/3 de la largeur de Georges
         var georgesDataX = this.georgesData.x,
@@ -157,10 +157,10 @@ var Collision = function () {
             return true;
         }
 
-    };
+    },
 
     // méthode appelée par la fonction pilote des déplacements d'Arthur pour détecter les collisions avec Georges
-    this.checkCollisionGeorges = function () {
+    checkCollisionGeorges: function () {
 
         this.initialisation();
 
@@ -181,15 +181,13 @@ var Collision = function () {
 
 };
 
-var collision = new Collision();
-
 //*============================================================/
 //*       GESTION DES REACTIONS SUITE A UNE COLLISION          / 
 //*============================================================/
 
-var ActionsCollision = function () {
+var actionsCollision = {
 
-    this.gereConsequences = function () {
+    gereConsequences: function () {
 
         //------------------------------------------------------------/
         //  collision d'Arthur avec un mur => il vacille, +1 gamelle  / 
@@ -312,8 +310,6 @@ var ActionsCollision = function () {
         scoreJeu.incrementGamelles();
         return;
 
-    };
+    }
 
 }
-
-var actionsCollision = new ActionsCollision();

@@ -28,7 +28,7 @@
 
 //**********************************************************************************************/
 //*  L'application comporte 5 fichiers .js:                                                    */
-//*  - personnages.js contient les constructeurs des personnages d'Arthur et Georges et qui    */
+//*  - personnages.js contient les variables objet des personnages d'Arthur et Georges et qui  */
 //*    permettent des manipuler les sprites/masque                                             */ 
 //*  - score.js permet l'enregistrement et l'affichage du score, de déterminer l'issue d'une   */
 //*    partie                                                                                  */
