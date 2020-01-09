@@ -1,4 +1,6 @@
 # Jeu CV
+1er 'devoir' de la formation IFOCOP (cours mi-oct 2019 / mi-février 2020) : réaliser un site présentant mon CV à travers un jeu.
+
 Site statique pour jouer sur v-randranto.github.io.
 
 Bugs identifiés :
